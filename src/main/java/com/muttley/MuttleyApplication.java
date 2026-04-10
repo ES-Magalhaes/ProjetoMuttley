@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class MuttleyApplication {
 
     public static void main(String[] args) {
-        // Este comando inicia todo o ecossistema do Spring Boot
         SpringApplication.run(MuttleyApplication.class, args);
     }
 }

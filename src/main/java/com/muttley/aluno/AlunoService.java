@@ -46,16 +46,15 @@ public class AlunoService {
 
 	@Transactional
 	public Aluno salvarOuAtualizar(AtualizacaoAluno dto) {
-		if (dto.ra() != null) {
-			// Modo Edição
+		if (dto.ra() == null) { // Se for null, o MapStruct cria uma nova entidade
+			Aluno novoAluno = mapper.toEntity(dto);
+			return ar.save(novoAluno);
+		} else {
+			// Se tiver RA, busca e atualiza
 			Aluno alunoExistente = ar.findById(dto.ra())
 					.orElseThrow(() -> new EntityNotFoundException("Aluno não encontrado"));
 			mapper.updateEntityFromDTO(dto, alunoExistente);
 			return ar.save(alunoExistente);
-		} else {
-			// Modo Criação
-			Aluno novoAluno = mapper.toEntity(dto);
-			return ar.save(novoAluno);
 		}
 	}
 }

@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 
 public record AtualizacaoAluno(
-    @NotNull(message = "RA é obrigatório para atualização")
     Long ra,
     
     @NotBlank(message = "Nome é obrigatório") 

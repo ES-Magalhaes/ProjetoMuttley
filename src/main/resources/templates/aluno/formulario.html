@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/head :: head('Formulário de Aluno')}"></head>
+<body>
+	<header th:replace="~{fragmentos/header :: header(activePage='Aluno')}"></header>
+
+	<div class="container" style="max-width: 600px;">
+		<div class="card shadow-sm">
+			<div class="card-header bg-dark text-white">
+				<h3 class="card-title mb-0"
+					th:text="${aluno.ra != null} ? 'Editar Aluno' : 'Novo Aluno'"></h3>
+			</div>
+			<div class="card-body">
+				<form th:action="@{/aluno/salvar}" th:object="${aluno}" method="post">
+
+					<input type="hidden" th:field="*{ra}" />
+
+					<div class="form-group mb-3">
+						<label for="nome" class="form-label">Nome Completo</label> <input
+							type="text" th:field="*{nome}" class="form-control"
+							th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid'"
+							placeholder="Digite o nome" />
+						<div class="invalid-feedback" th:if="${#fields.hasErrors('nome')}"
+							th:errors="*{nome}"></div>
+					</div>
+
+					<div class="form-group mb-3">
+						<label for="email" class="form-label">E-mail</label> <input
+							type="email" th:field="*{email}" class="form-control"
+							th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+							placeholder="exemplo@email.com" />
+						<div class="invalid-feedback"
+							th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+					</div>
+
+					<div class="form-group mb-4">
+						<label for="pontos" class="form-label">Pontuação</label> <input
+							type="number" th:field="*{pontos}" class="form-control"
+							th:classappend="${#fields.hasErrors('pontos')} ? 'is-invalid'" />
+						<div class="invalid-feedback"
+							th:if="${#fields.hasErrors('pontos')}" th:errors="*{pontos}"></div>
+					</div>
+
+					<div class="text-right">
+						<a th:href="@{/aluno}" class="btn btn-secondary mr-2">Cancelar</a>
+						<button type="submit" class="btn btn-success">Salvar
+							Aluno</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div th:replace="~{fragmentos/footer :: footer}"></div>
+</body>
+</html>
