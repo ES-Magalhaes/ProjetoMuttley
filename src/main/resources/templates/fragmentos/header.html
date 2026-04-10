@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <header th:fragment="header(activePage)">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+            <a class="navbar-brand" href="/aluno">Muttley</a>
+            <div class="navbar-nav">
+                <a class="nav-link" th:classappend="${activePage == 'Aluno' ? 'active' : ''}" href="/aluno">Alunos</a>
+            </div>
+        </nav>
+    </header>
+</body>
+</html>

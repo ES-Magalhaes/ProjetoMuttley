@@ -1,0 +1,89 @@
+/* =========================
+   FUNDO GERAL
+========================= */
+.bg-dark-purple {
+  background-color: #1e1e2f;
+  color: #fff;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+.sidebar {
+  width: 250px;
+  min-height: 100vh;
+  background-color: #2b2b40;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.4);
+}
+
+.sidebar .nav-link {
+  color: #c7c7d1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  background-color: #6f42c1;
+  color: #fff;
+}
+
+/* =========================
+   CONTEÚDO
+========================= */
+.content {
+  background-color: #1e1e2f;
+}
+
+/* =========================
+   CARDS
+========================= */
+.card {
+  background-color: #2b2b40;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* =========================
+   TABELA
+========================= */
+.table-dark th,
+.table-dark td {
+  vertical-align: middle;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+/* =========================
+   FORMULÁRIO
+========================= */
+.form-label {
+  color: #c7c7d1;
+}
+
+.form-control,
+.form-select {
+  background-color: #3a3a4e;
+  border: 1px solid #555;
+  color: #fff;
+}
+
+.form-control::placeholder {
+  color: #aaa;
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: #3a3a4e;
+  border-color: #6f42c1;
+  box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+  color: #fff;
+}
+.btn-primary {
+  background-color: #6f42c1;
+  border: none;
+}
