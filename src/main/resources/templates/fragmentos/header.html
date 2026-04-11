@@ -2,9 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 	<header th:fragment="header">
-		<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+		<nav
+			class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
 			<div class="container">
-				<a class="navbar-brand" th:href="@{/}">Muttley System</a>
+				<a class="navbar-brand" th:href="@{/aluno}"> <i
+					class="fa-solid fa-graduation-cap mr-2"></i>Muttley System
+				</a>
 				<button class="navbar-toggler" type="button" data-toggle="collapse"
 					data-target="#navbarNav">
 					<span class="navbar-toggler-icon"></span>
@@ -15,24 +18,33 @@
 						<li class="nav-item"
 							th:classappend="${activePage == 'Aluno'} ? 'active'"><a
 							class="nav-link" th:href="@{/aluno}"> <i
-								class="fa-solid fa-user-graduate mr-1"></i> Alunos
+								class="fa-solid fa-user-graduate"></i> Alunos
 						</a></li>
 
 						<li class="nav-item"
 							th:classappend="${activePage == 'Organizador'} ? 'active'">
 							<a class="nav-link" th:href="@{/organizador}"> <i
-								class="fa-solid fa-user-tie mr-1"></i> Organizadores
+								class="fa-solid fa-user-tie"></i> Organizadores
 						</a>
 						</li>
 
 						<li class="nav-item"
 							th:classappend="${activePage == 'Evento'} ? 'active'"><a
 							class="nav-link" th:href="@{/evento}"> <i
-								class="fa-solid fa-calendar-days mr-1"></i> Eventos
+								class="fa-solid fa-calendar-days"></i> Eventos
 						</a></li>
+
+						<li class="nav-item"
+							th:classappend="${activePage == 'Certificado'} ? 'active'">
+							<a class="nav-link" th:href="@{/certificado}"> <i
+								class="fa-solid fa-file-medal"></i> Certificados
+						</a>
+						</li>
 					</ul>
 
-					<span class="navbar-text"> Sistema Escolar v1.0 </span>
+					<span class="navbar-text d-none d-lg-block"> <small
+						class="text-muted">Gestão Acadêmica v1.0</small>
+					</span>
 				</div>
 			</div>
 		</nav>

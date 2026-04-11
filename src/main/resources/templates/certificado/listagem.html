@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/head :: head('Certificados Emitidos')}"></head>
+<body>
+	<header
+		th:replace="~{fragmentos/header :: header(activePage='Certificado')}"></header>
+	<div class="container" style="max-width: 900px;">
+		<h2 class="text-center mb-4">Certificados</h2>
+		<div class="mb-3 text-right">
+			<a th:href="@{/certificado/formulario}" class="btn btn-primary">Emitir
+				Novo Certificado</a>
+		</div>
+		<table class="table table-striped" th:if="${certificados.size() > 0}">
+			<thead>
+				<tr>
+					<th>Aluno</th>
+					<th>Evento</th>
+					<th>Medalha</th>
+					<th>Pontos</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="c : ${certificados}">
+					<td th:text="${c.aluno.nome}"></td>
+					<td th:text="${c.evento.tema}"></td>
+					<td><span class="badge badge-warning" th:text="${c.medalha}"></span></td>
+					<td th:text="${c.pontuacao}"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>

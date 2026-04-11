@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/head :: head('Listagem de Eventos')}"></head>
+<body>
+	<header
+		th:replace="~{fragmentos/header :: header(activePage='Evento')}"></header>
+
+	<div class="container" style="max-width: 900px;">
+		<h2 class="text-center mb-4">Eventos Agendados</h2>
+
+		<div th:if="${message}" class="alert alert-success text-center">[[${message}]]</div>
+
+		<div class="mb-3 text-right">
+			<a th:href="@{/evento/formulario}" class="btn btn-primary">Novo
+				Evento</a>
+		</div>
+
+		<div th:if="${eventos.size() > 0}">
+			<table class="table table-hover">
+				<thead class="thead-light">
+					<tr>
+						<th>Tema</th>
+						<th>Organizador</th>
+						<th>Pontos</th>
+						<th class="text-center">Ações</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="e : ${eventos}">
+						<td th:text="${e.tema}"></td>
+						<td th:text="${e.organizador.nome}"></td>
+						<td th:text="${e.pontos}"></td>
+						<td class="text-center"><a
+							th:href="@{/evento/formulario(id=${e.id})}"
+							class="text-primary mr-3"> <i
+								class="fa-regular fa-pen-to-square"></i>
+						</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div th:unless="${eventos.size() > 0}"
+			class="alert alert-info text-center">Nenhum evento cadastrado.</div>
+	</div>
+	<div th:replace="~{fragmentos/footer :: footer}"></div>
+</body>
+</html>
