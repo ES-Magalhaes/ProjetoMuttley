@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head
+	th:replace="~{fragmentos/head :: head('Listagem de Organizadores')}"></head>
+<body>
+	<header
+		th:replace="~{fragmentos/header :: header(activePage='Organizador')}"></header>
+
+	<div class="container" style="max-width: 900px;">
+		<h2 class="text-center mb-4">Organizadores</h2>
+
+		<div th:if="${message}" class="alert alert-success text-center">[[${message}]]</div>
+		<div th:if="${error}" class="alert alert-danger text-center">[[${error}]]</div>
+
+		<div class="mb-3 text-right">
+			<a th:href="@{/organizador/formulario}" class="btn btn-primary">Novo
+				Organizador</a>
+		</div>
+
+		<div th:if="${organizadores.size() > 0}">
+			<table class="table table-hover">
+				<thead class="thead-light">
+					<tr>
+						<th>Nome</th>
+						<th>Disciplinas</th>
+						<th>Qualificações</th>
+						<th class="text-center">Ações</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="org : ${organizadores}">
+						<td th:text="${org.nome}"></td>
+						<td th:text="${org.disciplinas}"></td>
+						<td th:text="${org.qualificacoes}"></td>
+						<td class="text-center"><a
+							th:href="@{/organizador/formulario(id=${org.id})}"
+							class="text-primary mr-3"> <i
+								class="fa-regular fa-pen-to-square"></i>
+						</a> <a th:href="@{'/organizador/delete/' + ${org.id}}"
+							class="text-danger"
+							onclick="return confirm('Excluir este organizador?')"> <i
+								class="fa-regular fa-trash-can"></i>
+						</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div th:unless="${organizadores.size() > 0}"
+			class="alert alert-info text-center">Nenhum organizador
+			cadastrado.</div>
+	</div>
+	<div th:replace="~{fragmentos/footer :: footer}"></div>
+</body>
+</html>

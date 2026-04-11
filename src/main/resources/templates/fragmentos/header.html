@@ -1,13 +1,41 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-    <header th:fragment="header(activePage)">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-            <a class="navbar-brand" href="/aluno">Muttley</a>
-            <div class="navbar-nav">
-                <a class="nav-link" th:classappend="${activePage == 'Aluno' ? 'active' : ''}" href="/aluno">Alunos</a>
-            </div>
-        </nav>
-    </header>
+	<header th:fragment="header">
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+			<div class="container">
+				<a class="navbar-brand" th:href="@{/}">Muttley System</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse"
+					data-target="#navbarNav">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+
+				<div class="collapse navbar-collapse" id="navbarNav">
+					<ul class="navbar-nav mr-auto">
+						<li class="nav-item"
+							th:classappend="${activePage == 'Aluno'} ? 'active'"><a
+							class="nav-link" th:href="@{/aluno}"> <i
+								class="fa-solid fa-user-graduate mr-1"></i> Alunos
+						</a></li>
+
+						<li class="nav-item"
+							th:classappend="${activePage == 'Organizador'} ? 'active'">
+							<a class="nav-link" th:href="@{/organizador}"> <i
+								class="fa-solid fa-user-tie mr-1"></i> Organizadores
+						</a>
+						</li>
+
+						<li class="nav-item"
+							th:classappend="${activePage == 'Evento'} ? 'active'"><a
+							class="nav-link" th:href="@{/evento}"> <i
+								class="fa-solid fa-calendar-days mr-1"></i> Eventos
+						</a></li>
+					</ul>
+
+					<span class="navbar-text"> Sistema Escolar v1.0 </span>
+				</div>
+			</div>
+		</nav>
+	</header>
 </body>
 </html>

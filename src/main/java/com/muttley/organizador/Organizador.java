@@ -17,7 +17,7 @@ public class Organizador {
 	private Long id;
 
 	private String nome;
-	private String disciplina;
+	private String disciplinas;
 	private String qualificacoes;
 
 	@OneToMany(mappedBy = "organizador")
