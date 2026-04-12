@@ -2,15 +2,23 @@
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragmentos/head :: head('Certificados Emitidos')}"></head>
 <body>
-	<header
-		th:replace="~{fragmentos/header :: header(activePage='Certificado')}"></header>
-	<div class="container" style="max-width: 900px;">
-		<h2 class="text-center mb-4">Certificados</h2>
-		<div class="mb-3 text-right">
-			<a th:href="@{/certificado/formulario}" class="btn btn-primary">Emitir
-				Novo Certificado</a>
+	<header th:replace="~{fragmentos/header :: header(activePage='certificados')}"></header>
+
+	<div class="container">
+		<div class="image-container">
+				<img th:src="@{/images/certificado.png}"
+				     src="/images/certificado.png"
+				     alt="Bem vindo a página de gestão de certificados "
+				     class="image">
 		</div>
-		<table class="table table-striped" th:if="${certificados.size() > 0}">
+		<div class="header-crud">
+			<h2>Certificados Emitidos</h2>
+			<a th:href="@{/certificado/formulario}" class="btn">
+				<i class="fa-solid fa-certificate"></i> Emitir Certificado
+			</a>
+		</div>
+
+		<table th:if="${certificados.size() > 0}">
 			<thead>
 				<tr>
 					<th>Aluno</th>
@@ -28,6 +36,12 @@
 				</tr>
 			</tbody>
 		</table>
+
+		<div th:unless="${certificados.size() > 0}" class="alert alert-info">
+			Nenhum certificado emitido ainda.
+		</div>
 	</div>
+
+	<div th:replace="~{fragmentos/footer :: footer}"></div>
 </body>
 </html>

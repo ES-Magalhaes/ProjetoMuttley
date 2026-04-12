@@ -1,25 +1,30 @@
 <!DOCTYPE html>
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
-<head
-	th:replace="~{fragmentos/head :: head('Listagem de Organizadores')}"></head>
+<head th:replace="~{fragmentos/head :: head('Gestão de Organizadores')}"></head>
 <body>
-	<header
-		th:replace="~{fragmentos/header :: header(activePage='Organizador')}"></header>
+	<header th:replace="~{fragmentos/header :: header(activePage='organizadores')}"></header>
 
-	<div class="container" style="max-width: 900px;">
-		<h2 class="text-center mb-4">Organizadores</h2>
+	<div class="container">
+		<div th:if="${message}" class="alert alert-success">[[${message}]]</div>
+		<div th:if="${error}"   class="alert alert-danger">[[${error}]]</div>
 
-		<div th:if="${message}" class="alert alert-success text-center">[[${message}]]</div>
-		<div th:if="${error}" class="alert alert-danger text-center">[[${error}]]</div>
-
-		<div class="mb-3 text-right">
-			<a th:href="@{/organizador/formulario}" class="btn btn-primary">Novo
-				Organizador</a>
+		<div class="image-container">
+				<img th:src="@{/images/palestrante.png}"
+				     src="/images/palestrante.png"
+				     alt="Bem vindo a página de gestão de organizadores"
+				     class="image">
+		</div>
+    
+		<div class="header-crud">
+			<h2>Gestão de Organizadores</h2>
+			<a th:href="@{/organizador/formulario}" class="btn">
+				<i class="fa-solid fa-circle-plus"></i> Novo Organizador
+			</a>
 		</div>
 
 		<div th:if="${organizadores.size() > 0}">
-			<table class="table table-hover">
-				<thead class="thead-light">
+			<table>
+				<thead>
 					<tr>
 						<th>Nome</th>
 						<th>Disciplinas</th>
@@ -32,24 +37,25 @@
 						<td th:text="${org.nome}"></td>
 						<td th:text="${org.disciplinas}"></td>
 						<td th:text="${org.qualificacoes}"></td>
-						<td class="text-center"><a
-							th:href="@{/organizador/formulario(id=${org.id})}"
-							class="text-primary mr-3"> <i
-								class="fa-regular fa-pen-to-square"></i>
-						</a> <a th:href="@{'/organizador/delete/' + ${org.id}}"
-							class="text-danger"
-							onclick="return confirm('Excluir este organizador?')"> <i
-								class="fa-regular fa-trash-can"></i>
-						</a></td>
+						<td class="text-center">
+							<a th:href="@{/organizador/formulario(id=${org.id})}" class="text-primary mr-3" title="Editar">
+								<i class="fa-regular fa-pen-to-square"></i>
+							</a>
+							<a th:href="@{'/organizador/delete/' + ${org.id}}" class="text-danger" title="Excluir"
+							   onclick="return confirm('Excluir este organizador?')">
+								<i class="fa-regular fa-trash-can"></i>
+							</a>
+						</td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
 
-		<div th:unless="${organizadores.size() > 0}"
-			class="alert alert-info text-center">Nenhum organizador
-			cadastrado.</div>
+		<div th:unless="${organizadores.size() > 0}" class="alert alert-info">
+			Nenhum organizador cadastrado ainda.
+		</div>
 	</div>
+
 	<div th:replace="~{fragmentos/footer :: footer}"></div>
 </body>
 </html>
