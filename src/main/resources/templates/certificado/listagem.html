@@ -1,44 +1,79 @@
 <!DOCTYPE html>
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragmentos/head :: head('Certificados Emitidos')}"></head>
+<head
+	th:replace="~{fragmentos/head :: head('Listagem de Certificados')}"></head>
 <body>
-	<header th:replace="~{fragmentos/header :: header(activePage='certificados')}"></header>
+	<header
+		th:replace="~{fragmentos/header :: header(activePage='Certificado')}"></header>
 
-	<div class="container">
-		<div class="image-container">
-				<img th:src="@{/images/certificado.png}"
-				     src="/images/certificado.png"
-				     alt="Bem vindo a página de gestão de certificados "
-				     class="image">
+	<div class="container" style="max-width: 1000px;">
+		<h2 class="text-center mb-4">Certificados Emitidos</h2>
+
+		<div th:if="${message != null}"
+			class="alert alert-success alert-dismissible fade show text-center"
+			role="alert">
+			<i class="fa-solid fa-check-double mr-2"></i> [[${message}]]
+			<button type="button" class="close" data-dismiss="alert"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
 		</div>
-		<div class="header-crud">
-			<h2>Certificados Emitidos</h2>
-			<a th:href="@{/certificado/formulario}" class="btn">
-				<i class="fa-solid fa-certificate"></i> Emitir Certificado
+
+		<div class="mb-3 text-right">
+			<a th:href="@{/certificado/formulario}"
+				class="btn btn-primary shadow-sm"> <i
+				class="fa-solid fa-plus mr-1"></i> Novo Certificado
 			</a>
 		</div>
 
-		<table th:if="${certificados.size() > 0}">
-			<thead>
-				<tr>
-					<th>Aluno</th>
-					<th>Evento</th>
-					<th>Medalha</th>
-					<th>Pontos</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr th:each="c : ${certificados}">
-					<td th:text="${c.aluno.nome}"></td>
-					<td th:text="${c.evento.tema}"></td>
-					<td><span class="badge badge-warning" th:text="${c.medalha}"></span></td>
-					<td th:text="${c.pontuacao}"></td>
-				</tr>
-			</tbody>
-		</table>
+		<div th:if="${certificados.size() > 0}" class="card shadow-sm">
+			<div class="table-responsive">
+				<table class="table table-hover mb-0">
+					<thead class="thead-light">
+						<tr>
+							<th>Certificado</th>
+							<th>Aluno</th>
+							<th>Evento</th>
+							<th class="text-center">Medalha</th>
+							<th class="text-center">Pontos</th>
+							<th class="text-center">Ações</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="c : ${certificados}">
+							<td th:text="${c.nomeCertificado}"></td>
 
-		<div th:unless="${certificados.size() > 0}" class="alert alert-info">
-			Nenhum certificado emitido ainda.
+							<td th:text="${c.aluno != null ? c.aluno.nome : 'N/A'}"></td>
+							<td th:text="${c.evento != null ? c.evento.tema : 'N/A'}"></td>
+
+							<td class="text-center"><span
+								th:classappend="${c.medalha == 'Ouro' ? 'badge-warning' : 
+                                                 c.medalha == 'Prata' ? 'badge-secondary' : 
+                                                 c.medalha == 'Bronze' ? 'badge-danger' : 'badge-info'}"
+								class="badge p-2 shadow-sm" th:text="${c.medalha}"> </span></td>
+
+							<td class="text-center font-weight-bold"
+								th:text="${c.pontuacaoObtida}"></td>
+
+							<td class="text-center"><a
+								th:href="@{'/certificado/formulario/' + ${c.id}}"
+								title="Editar Certificado" class="text-primary mr-3"> <i
+									class="fa-regular fa-pen-to-square"></i>
+							</a> <a th:href="@{'/certificado/delete/' + ${c.id}}"
+								title="Excluir Certificado" class="text-danger"
+								onclick="return confirm('Tem certeza que deseja excluir este certificado permanentemente?')">
+									<i class="fa-regular fa-trash-can"></i>
+							</a></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div th:unless="${certificados.size() > 0}"
+			class="alert alert-info text-center shadow-sm">
+			<i class="fa-solid fa-circle-info mr-2"></i> Nenhum certificado
+			emitido até o momento.
 		</div>
 	</div>
 
