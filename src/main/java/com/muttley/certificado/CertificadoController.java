@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -48,6 +49,25 @@ public class CertificadoController {
 			return "certificado/formulario";
 		}
 		certificadoService.salvarOuAtualizar(dto);
+		return "redirect:/certificado";
+	}
+
+	@GetMapping("/formulario/{id}")
+	public String editar(@PathVariable("id") Long id, Model model) {
+		// Agora o Service entrega o DTO prontinho
+		model.addAttribute("certificado", certificadoService.buscarParaEdicao(id));
+
+		// Recarregamos as listas para os selects de Aluno e Evento
+		model.addAttribute("alunos", alunoService.procurarTodos());
+		model.addAttribute("eventos", eventoService.listarTodos());
+
+		return "certificado/formulario";
+	}
+
+	// Rota para exclusão
+	@GetMapping("/delete/{id}")
+	public String excluir(@PathVariable("id") Long id) {
+		certificadoService.excluir(id);
 		return "redirect:/certificado";
 	}
 }

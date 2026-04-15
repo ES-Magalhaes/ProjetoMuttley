@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/head :: head('Início - Projeto Muttley')}"></head>
+<body>
+	<header th:replace="~{fragmentos/header :: header(activePage='inicio')}"></header>
+
+	<main>
+		<section class="welcome-section">
+			<div class="welcome-image-container">
+				<img th:src="@{/images/boas_vindas_projeto_muttley.png}"
+				     src="/images/boas_vindas_projeto_muttley.png"
+				     alt="Bem-vindo ao Projeto Muttley"
+				     class="welcome-image">
+			</div>
+			<div class="welcome-text">
+				<h1>Bem-vindo ao Projeto Muttley!</h1>
+				<p>O seu sistema definitivo de gerenciamento acadêmico. Aqui você pode organizar eventos de forma inteligente, gerenciar alunos, cadastrar organizadores e emitir certificados diretamente na plataforma. Navegue pelo menu acima para começar!</p>
+			</div>
+		</section>
+
+		
+	</main>
+
+	<div th:replace="~{fragmentos/footer :: footer}"></div>
+</body>
+</html>

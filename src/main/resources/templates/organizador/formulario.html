@@ -1,51 +1,54 @@
 <!DOCTYPE html>
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
-<head
-	th:replace="~{fragmentos/head :: head('Formulário de Organizador')}"></head>
+<head th:replace="~{fragmentos/head :: head('Formulário de Organizador')}"></head>
 <body>
-	<header
-		th:replace="~{fragmentos/header :: header(activePage='Organizador')}"></header>
+	<header th:replace="~{fragmentos/header :: header(activePage='organizadores')}"></header>
 
-	<div class="container" style="max-width: 600px;">
-		<div class="card shadow-sm">
-			<div class="card-header bg-dark text-white">
+	<div class="container" style="max-width: 620px;">
+		<div class="card">
+			<div class="card-header">
 				<h3 class="card-title mb-0"
-					th:text="${organizador.id != null} ? 'Editar Organizador' : 'Novo Organizador'"></h3>
+				    th:text="${organizador.id != null} ? 'Editar Organizador' : 'Novo Organizador'">Formulário</h3>
 			</div>
 			<div class="card-body">
-				<form th:action="@{/organizador/salvar}" th:object="${organizador}"
-					method="post">
-
+				<form th:action="@{/organizador/salvar}" th:object="${organizador}" method="post">
 					<input type="hidden" th:field="*{id}" />
 
-					<div class="mb-3">
-						<label class="form-label">Nome</label> <input type="text"
-							th:field="*{nome}" class="form-control"
-							th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid'" />
+					<div class="form-group">
+						<label class="form-label">Nome</label>
+						<input type="text" th:field="*{nome}" class="form-control"
+						       th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid'"
+						       placeholder="Nome do organizador" />
 						<div class="invalid-feedback" th:errors="*{nome}"></div>
 					</div>
 
-					<div class="mb-3">
-						<label class="form-label">Disciplinas</label> <input type="text"
-							th:field="*{disciplinas}" class="form-control"
-							th:classappend="${#fields.hasErrors('disciplinas')} ? 'is-invalid'" />
+					<div class="form-group">
+						<label class="form-label">Disciplinas</label>
+						<input type="text" th:field="*{disciplinas}" class="form-control"
+						       th:classappend="${#fields.hasErrors('disciplinas')} ? 'is-invalid'"
+						       placeholder="Ex: Matemática, Física" />
 						<div class="invalid-feedback" th:errors="*{disciplinas}"></div>
 					</div>
 
-					<div class="mb-3">
+					<div class="form-group">
 						<label class="form-label">Qualificações</label>
-						<textarea th:field="*{qualificacoes}" class="form-control"
-							rows="3"></textarea>
+						<textarea th:field="*{qualificacoes}" class="form-control" rows="3"
+						          placeholder="Descreva as qualificações..."></textarea>
 					</div>
 
-					<div class="text-right">
-						<a th:href="@{/organizador}" class="btn btn-secondary mr-2">Cancelar</a>
-						<button type="submit" class="btn btn-success">Salvar</button>
+					<div style="display:flex; gap:0.75rem; justify-content:flex-end; margin-top:1.5rem;">
+						<a th:href="@{/organizador}" class="btn btn-secondary">
+							<i class="fa-solid fa-arrow-left"></i> Cancelar
+						</a>
+						<button type="submit" class="btn btn-success">
+							<i class="fa-solid fa-floppy-disk"></i> Salvar
+						</button>
 					</div>
 				</form>
 			</div>
 		</div>
 	</div>
+
 	<div th:replace="~{fragmentos/footer :: footer}"></div>
 </body>
 </html>

@@ -15,6 +15,14 @@ public class CertificadoService {
 	@Autowired
 	private CertificadoMapper mapper;
 
+	// Este método busca a entidade e já a transforma no DTO que o formulário espera
+	public DadosCertificado buscarParaEdicao(Long id) {
+		Certificado certificado = repository.findById(id)
+				.orElseThrow(() -> new RuntimeException("Certificado não encontrado"));
+
+		return mapper.toDTO(certificado);
+	}
+
 	// Lista todos os certificados para a página de listagem
 	public List<Certificado> listarTodos() {
 		return repository.findAll();
@@ -46,9 +54,9 @@ public class CertificadoService {
 	// Remove um certificado
 	@Transactional
 	public void excluir(Long id) {
-		if (!repository.existsById(id)) {
-			throw new EntityNotFoundException("Não é possível excluir: Certificado não encontrado.");
+		// Verifica se existe antes de tentar deletar para evitar erros chatos
+		if (repository.existsById(id)) {
+			repository.deleteById(id);
 		}
-		repository.deleteById(id);
 	}
 }

@@ -1,43 +1,31 @@
 <!DOCTYPE html>
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragmentos/head :: head('Listagem de Alunos')}"></head>
+<head th:replace="~{fragmentos/head :: head('Gestão de Alunos')}"></head>
 <body>
-	<header th:replace="~{fragmentos/header :: header(activePage='Aluno')}"></header>
+	<header th:replace="~{fragmentos/header :: header(activePage='alunos')}"></header>
 
-	<div class="container" style="max-width: 900px;">
-		<h2 class="text-center mb-4">Lista de Alunos</h2>
-
-		<div th:if="${message != null}"
-			class="alert alert-success alert-dismissible fade show text-center"
-			role="alert">
-			[[${message}]]
-			<button type="button" class="close" data-dismiss="alert"
-				aria-label="Close">
-				<span aria-hidden="true">&times;</span>
-			</button>
+	<main class="container">
+		<div th:if="${message}" class="alert alert-success" role="alert">[[${message}]]</div>
+		<div th:if="${error}"   class="alert alert-danger"  role="alert">[[${error}]]</div>
+        <div class="image-container">
+				<img th:src="@{/images/aluna_oculos.png}"
+				     src="/images/aluna_oculos.png"
+				     alt="Bem vindo a página de gestão de alunos"
+				     class="image">
 		</div>
-
-		<div th:if="${error != null}"
-			class="alert alert-danger alert-dismissible fade show text-center"
-			role="alert">
-			[[${error}]]
-			<button type="button" class="close" data-dismiss="alert"
-				aria-label="Close">
-				<span aria-hidden="true">&times;</span>
-			</button>
-		</div>
-
-		<div class="mb-3 text-right">
-			<a th:href="@{/aluno/formulario}" class="btn btn-primary">Novo
-				Aluno</a>
+		<div class="header-crud">
+			<h2>Gestão de Alunos</h2>
+			<a th:href="@{/aluno/formulario}" class="btn">
+				<i class="fa-solid fa-user-plus"></i> Novo Aluno
+			</a>
 		</div>
 
 		<div th:if="${listaAlunos.size() > 0}">
-			<table class="table table-hover">
-				<thead class="thead-light">
+			<table>
+				<thead>
 					<tr>
 						<th>Nome</th>
-						<th>Email</th>
+						<th>E-mail</th>
 						<th>Pontos</th>
 						<th class="text-center">Ações</th>
 					</tr>
@@ -47,23 +35,24 @@
 						<td th:text="${aluno.nome}"></td>
 						<td th:text="${aluno.email}"></td>
 						<td th:text="${aluno.pontos}"></td>
-						<td class="text-center"><a
-							th:href="@{'/aluno/formulario/' + ${aluno.ra}}"
-							title="Editar Aluno" class="text-primary mr-3"> <i
-								class="fa-regular fa-pen-to-square"></i>
-						</a> <a th:href="@{'/aluno/delete/' + ${aluno.ra}}"
-							title="Excluir Aluno" class="text-danger"
-							onclick="return confirm('Tem certeza que deseja excluir este aluno?')">
-								<i class="fa-regular fa-trash-can"></i>
-						</a></td>
+						<td class="text-center">
+							<a th:href="@{'/aluno/formulario/' + ${aluno.ra}}" class="btn btn-sm" title="Editar">
+								<i class="fa-regular fa-pen-to-square"></i> Editar
+							</a>
+							<a th:href="@{'/aluno/delete/' + ${aluno.ra}}" class="btn btn-sm btn-danger" title="Excluir"
+							   onclick="return confirm('Deseja excluir este aluno?')">
+								<i class="fa-regular fa-trash-can"></i> Excluir
+							</a>
+						</td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
 
-		<div th:unless="${listaAlunos.size() > 0}"
-			class="alert alert-info text-center">Nenhum aluno cadastrado.</div>
-	</div>
+		<div th:unless="${listaAlunos.size() > 0}" class="alert alert-info">
+			Nenhum aluno cadastrado ainda.
+		</div>
+	</main>
 
 	<div th:replace="~{fragmentos/footer :: footer}"></div>
 </body>
