@@ -7,14 +7,14 @@
 	<main class="container">
 		<div th:if="${message}" class="alert alert-success" role="alert">[[${message}]]</div>
 		<div th:if="${error}"   class="alert alert-danger"  role="alert">[[${error}]]</div>
-        <div class="image-container">
-				<img th:src="@{/images/aluna_oculos.png}"
-				     src="/images/aluna_oculos.png"
-				     alt="Bem vindo a página de gestão de alunos"
-				     class="image">
-		</div>
+        <div class="hero-section" th:style="'background-image: url(' + @{/images/aluna_oculos.png} + ');'">
+            <div class="hero-content">
+                <h1>Gestão de Alunos</h1>
+                <p>Gerencie os alunos do sistema Muttley de forma eficiente e organizada.</p>
+            </div>
+        </div>
 		<div class="header-crud">
-			<h2>Gestão de Alunos</h2>
+			<h2>Alunos Cadastrados</h2>
 			<a th:href="@{/aluno/formulario}" class="btn">
 				<i class="fa-solid fa-user-plus"></i> Novo Aluno
 			</a>

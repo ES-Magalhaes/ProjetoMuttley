@@ -8,15 +8,15 @@
 		<div th:if="${message}" class="alert alert-success">[[${message}]]</div>
 		<div th:if="${error}"   class="alert alert-danger">[[${error}]]</div>
 
-		<div class="image-container">
-				<img th:src="@{/images/palestrante.png}"
-				     src="/images/palestrante.png"
-				     alt="Bem vindo a página de gestão de organizadores"
-				     class="image">
-		</div>
+		<div class="hero-section" th:style="'background-image: url(' + @{/images/palestrante.png} + ');'">
+            <div class="hero-content">
+                <h1>Gestão de Organizadores</h1>
+                <p>Administre os organizadores de eventos no sistema Muttley.</p>
+            </div>
+        </div>
     
 		<div class="header-crud">
-			<h2>Gestão de Organizadores</h2>
+			<h2>Organizadores Cadastrados</h2>
 			<a th:href="@{/organizador/formulario}" class="btn">
 				<i class="fa-solid fa-circle-plus"></i> Novo Organizador
 			</a>

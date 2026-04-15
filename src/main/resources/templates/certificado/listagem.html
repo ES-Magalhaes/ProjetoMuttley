@@ -7,7 +7,12 @@
 		th:replace="~{fragmentos/header :: header(activePage='Certificado')}"></header>
 
 	<div class="container" style="max-width: 1000px;">
-		<h2 class="text-center mb-4">Certificados Emitidos</h2>
+		<div class="hero-section" th:style="'background-image: url(' + @{/images/certificado.png} + ');'">
+            <div class="hero-content">
+                <h1>Certificados Emitidos</h1>
+                <p>Visualize e gerencie os certificados emitidos no sistema Muttley.</p>
+            </div>
+        </div>
 
 		<div th:if="${message != null}"
 			class="alert alert-success alert-dismissible fade show text-center"

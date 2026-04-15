@@ -6,7 +6,10 @@
 			<div class="navbar-brand">
 				<a th:href="@{/}"
 					   th:classappend="${activePage == 'inicio'} ? 'active'"
-					   id="link-inicio" style="color: white; text-decoration: none;">Muttley System</a>
+					   id="link-inicio" style="color: white; text-decoration: none; display: flex; align-items: center; gap: 10px;">
+					<img th:src="@{/images/logo_muttley.png}" src="/images/logo_muttley.png" alt="Logo Muttley" style="height: 40px; width: auto;">
+					Muttley System
+				</a>
 			</div>
 			<ul class="navbar-nav">
 				<li class="nav-item">

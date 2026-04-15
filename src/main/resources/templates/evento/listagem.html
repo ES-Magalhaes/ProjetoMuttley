@@ -7,12 +7,12 @@
 	<div class="container">
 		<div th:if="${message}" class="alert alert-success">[[${message}]]</div>
 
-		<div class="image-container">
-				<img th:src="@{/images/evento.png}"
-				     src="/images/evento.png"
-				     alt="Bem vindo a página de gestão de eventos "
-				     class="image">
-		</div>
+		<div class="hero-section" th:style="'background-image: url(' + @{/images/evento.png} + ');'">
+            <div class="hero-content">
+                <h1>Gestão de Eventos</h1>
+                <p>Organize e gerencie os eventos do sistema Muttley.</p>
+            </div>
+        </div>
     
 
 		<div class="header-crud">
