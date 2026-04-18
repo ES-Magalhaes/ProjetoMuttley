@@ -2,50 +2,72 @@
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragmentos/head :: head('Formulário de Evento')}"></head>
 <body>
-	<header th:replace="~{fragmentos/header :: header(activePage='eventos')}"></header>
+	<header
+		th:replace="~{fragmentos/header :: header(activePage='Evento')}"></header>
 
-	<div class="container" style="max-width: 620px;">
-		<div class="card">
-			<div class="card-header">
-				<h3 class="card-title mb-0">Dados do Evento</h3>
+	<div class="container mt-4" style="max-width: 700px;">
+		<div class="card shadow">
+			<div class="card-header bg-primary text-white">
+				<h3 class="card-title mb-0"
+					th:text="${evento.id == null ? 'Novo Evento' : 'Editar Evento'}"></h3>
 			</div>
 			<div class="card-body">
-				<form th:action="@{/evento/salvar}" th:object="${evento}" method="post">
+				<form th:action="@{/evento/salvar}" th:object="${evento}"
+					method="post">
 					<input type="hidden" th:field="*{id}" />
 
-					<div class="form-group">
-						<label class="form-label">Tema do Evento</label>
+					<div class="form-group mb-3">
+						<label class="form-label font-weight-bold">Tema do Evento</label>
 						<input type="text" th:field="*{tema}" class="form-control"
-						       th:classappend="${#fields.hasErrors('tema')} ? 'is-invalid'"
-						       placeholder="Digite o tema do evento" />
+							th:classappend="${#fields.hasErrors('tema')} ? 'is-invalid'"
+							placeholder="Ex: Workshop Spring Boot" />
+						<div class="invalid-feedback" th:errors="*{tema}"></div>
+					</div>
+					
+					<div class="form-group mb-3">
+						<label class="form-label font-weight-bold">Descrição do Evento</label>
+						<input type="text" th:field="*{descricao}" class="form-control"
+							th:classappend="${#fields.hasErrors('descricao')} ? 'is-invalid'"
+							placeholder="Ex: Workshop falando sobre aplicação e boas práticas do Springboot" />
+						<div class="invalid-feedback" th:errors="*{descricao}"></div>
 					</div>
 
-					<div class="form-group">
-						<label class="form-label">Organizador Responsável</label>
-						<select th:field="*{organizadorId}" class="form-control"
-						        th:classappend="${#fields.hasErrors('organizadorId')} ? 'is-invalid'">
+					<div class="row">
+						<div class="col-md-7">
+							<div class="form-group mb-3">
+								<label class="form-label font-weight-bold">Local</label> <input
+									type="text" th:field="*{local}" class="form-control"
+									th:classappend="${#fields.hasErrors('local')} ? 'is-invalid'"
+									placeholder="Ex: Auditório ou URL do Meet" />
+								<div class="invalid-feedback" th:errors="*{local}"></div>
+							</div>
+						</div>
+						<div class="col-md-5">
+							<div class="form-group mb-3">
+								<label class="form-label font-weight-bold">Data</label> <input
+									type="date" th:field="*{data}" class="form-control"
+									th:classappend="${#fields.hasErrors('data')} ? 'is-invalid'" />
+								<div class="invalid-feedback" th:errors="*{data}"></div>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group mb-4">
+						<label class="form-label font-weight-bold">Organizador
+							Responsável</label> <select th:field="*{organizadorId}"
+							class="form-control"
+							th:classappend="${#fields.hasErrors('organizadorId')} ? 'is-invalid'">
 							<option value="">Selecione um organizador...</option>
-							<option th:each="org : ${organizadores}" th:value="${org.id}" th:text="${org.nome}"></option>
+							<option th:each="o : ${organizadores}" th:value="${o.id}"
+								th:text="${o.nome}"></option>
 						</select>
+						<div class="invalid-feedback" th:errors="*{organizadorId}"></div>
 					</div>
 
-					<div class="form-group">
-						<label class="form-label">Pontuação Atribuída</label>
-						<input type="number" th:field="*{pontos}" class="form-control" />
-					</div>
-
-					<div class="form-group">
-						<label class="form-label">Descrição</label>
-						<textarea th:field="*{descricao}" class="form-control" rows="3"
-						          placeholder="Descreva o evento..."></textarea>
-					</div>
-
-					<div style="display:flex; gap:0.75rem; justify-content:flex-end; margin-top:1.5rem;">
-						<a th:href="@{/evento}" class="btn btn-secondary">
-							<i class="fa-solid fa-arrow-left"></i> Cancelar
-						</a>
+					<div class="d-flex justify-content-end border-top pt-3">
+						<a th:href="@{/evento}" class="btn btn-secondary mr-2">Cancelar</a>
 						<button type="submit" class="btn btn-success">
-							<i class="fa-solid fa-floppy-disk"></i> Salvar Evento
+							<i class="fa-solid fa-floppy-disk mr-1"></i> Salvar Evento
 						</button>
 					</div>
 				</form>
