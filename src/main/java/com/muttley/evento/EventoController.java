@@ -1,17 +1,12 @@
 package com.muttley.evento;
 
+import com.muttley.organizador.OrganizadorService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import com.muttley.organizador.OrganizadorService;
-
-import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/evento")
@@ -31,8 +26,14 @@ public class EventoController {
 
 	@GetMapping("/formulario")
 	public String formulario(Model model) {
-		model.addAttribute("evento", new DadosEvento(null, "", "", 0, null));
-		// IMPORTANTE: Enviamos a lista de organizadores para o Select
+		model.addAttribute("evento", new DadosEvento(null, "", "", "", null, null));
+		model.addAttribute("organizadores", organizadorService.listarTodos());
+		return "evento/formulario";
+	}
+
+	@GetMapping("/formulario/{id}")
+	public String editar(@PathVariable Long id, Model model) {
+		model.addAttribute("evento", eventoService.buscarParaEdicao(id));
 		model.addAttribute("organizadores", organizadorService.listarTodos());
 		return "evento/formulario";
 	}
@@ -44,6 +45,12 @@ public class EventoController {
 			return "evento/formulario";
 		}
 		eventoService.salvarOuAtualizar(dto);
+		return "redirect:/evento";
+	}
+
+	@GetMapping("/delete/{id}")
+	public String excluir(@PathVariable Long id) {
+		eventoService.excluir(id);
 		return "redirect:/evento";
 	}
 }

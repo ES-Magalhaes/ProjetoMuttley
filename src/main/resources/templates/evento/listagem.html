@@ -1,55 +1,57 @@
 <!DOCTYPE html>
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragmentos/head :: head('Gestão de Eventos')}"></head>
+<head th:replace="~{fragmentos/head :: head('Listagem de Eventos')}"></head>
 <body>
-	<header th:replace="~{fragmentos/header :: header(activePage='eventos')}"></header>
+	<header
+		th:replace="~{fragmentos/header :: header(activePage='Evento')}"></header>
 
-	<div class="container">
-		<div th:if="${message}" class="alert alert-success">[[${message}]]</div>
-
-		<div class="hero-section" th:style="'background-image: url(' + @{/images/evento.png} + ');'">
-            <div class="hero-content">
-                <h1>Gestão de Eventos</h1>
-                <p>Organize e gerencie os eventos do sistema Muttley.</p>
-            </div>
-        </div>
-    
-
-		<div class="header-crud">
-			<h2>Eventos Agendados</h2>
-			<a th:href="@{/evento/formulario}" class="btn">
-				<i class="fa-solid fa-calendar-plus"></i> Novo Evento
+	<div class="container mt-4">
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<h2>Eventos Cadastrados</h2>
+			<a th:href="@{/evento/formulario}" class="btn btn-primary"> <i
+				class="fa-solid fa-plus"></i> Novo Evento
 			</a>
 		</div>
 
-		<div th:if="${eventos.size() > 0}">
-			<table>
-				<thead>
-					<tr>
-						<th>Tema</th>
-						<th>Organizador</th>
-						<th>Pontos</th>
-						<th class="text-center">Ações</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr th:each="e : ${eventos}">
-						<td th:text="${e.tema}"></td>
-						<td th:text="${e.organizador.nome}"></td>
-						<td th:text="${e.pontos}"></td>
-						<td class="text-center">
-							<a th:href="@{/evento/formulario(id=${e.id})}" class="text-primary" title="Editar">
-								<i class="fa-regular fa-pen-to-square"></i>
-							</a>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+		<div class="card shadow-sm">
+			<div class="table-responsive">
+				<table class="table table-hover mb-0">
+					<thead class="thead-light">
+						<tr>
+							<th>Tema</th>
+							<th>Descrição</th>
+							<th>Local</th>
+							<th>Data</th>
+							<th>Organizador</th>
+							<th class="text-center">Ações</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="e : ${eventos}">
+							<td th:text="${e.tema}" class="font-weight-bold"></td>
+							<td th:text="${e.descricao}"></td>
+							<td th:text="${e.local}"></td>
+							<td th:text="${#temporals.format(e.data, 'dd/MM/yyyy')}"></td>
+							<td
+								th:text="${e.organizador != null ? e.organizador.nome : 'Sem Organizador'}"></td>
+							<td class="text-end"><a
+								th:href="@{'/evento/formulario/' + ${e.id}}"
+								class="text-primary mr-3" title="Editar"> <i
+									class="fa-regular fa-pen-to-square"></i>
+							</a> <a th:href="@{'/evento/delete/' + ${e.id}}" class="text-danger"
+								title="Excluir"
+								onclick="return confirm('Deseja excluir este evento?')"> <i
+									class="fa-regular fa-trash-can"></i>
+							</a></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
 
-		<div th:unless="${eventos.size() > 0}" class="alert alert-info">
-			Nenhum evento cadastrado ainda.
-		</div>
+		<div th:if="${eventos.empty}"
+			class="alert alert-info mt-3 text-center">Nenhum evento
+			cadastrado.</div>
 	</div>
 
 	<div th:replace="~{fragmentos/footer :: footer}"></div>

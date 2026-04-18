@@ -31,6 +31,18 @@ public class EventoService {
 	}
 
 	public Evento buscarPorId(Long id) {
-		return repository.findById(id).orElseThrow();
+		return repository.findById(id).orElseThrow(() -> new RuntimeException("Evento não encontrado"));
+	}
+
+	public DadosEvento buscarParaEdicao(Long id) {
+		Evento evento = buscarPorId(id);
+		return mapper.toDTO(evento);
+	}
+
+	@Transactional
+	public void excluir(Long id) {
+		if (repository.existsById(id)) {
+			repository.deleteById(id);
+		}
 	}
 }
