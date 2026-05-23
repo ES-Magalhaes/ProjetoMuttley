@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.muttley.aluno.Aluno;
-import com.muttley.certificado.Certificado;
 import com.muttley.organizador.Organizador;
 
 import jakarta.persistence.CascadeType;
@@ -43,10 +41,4 @@ public class Evento {
 	@ManyToOne
 	@JoinColumn(name = "organizador_id")
 	private Organizador organizador;
-
-	@ManyToMany(mappedBy = "eventos")
-	private List<Aluno> participantes;
-
-	@OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Certificado> certificados;
 }
