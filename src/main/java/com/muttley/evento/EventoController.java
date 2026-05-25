@@ -26,7 +26,7 @@ public class EventoController {
 
 	@GetMapping("/formulario")
 	public String formulario(Model model) {
-		model.addAttribute("evento", new DadosEvento(null, "", "", "", null, null));
+		model.addAttribute("evento", new DadosEvento(null, "", "", "", null, null, null, null));
 		model.addAttribute("organizadores", organizadorService.listarTodos());
 		return "evento/formulario";
 	}

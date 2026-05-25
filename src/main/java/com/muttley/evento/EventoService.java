@@ -20,6 +20,10 @@ public class EventoService {
 
 	@Transactional
 	public void salvarOuAtualizar(DadosEvento dto) {
+		if (dto.horaFim().isBefore(dto.horaInicio())) {
+			throw new IllegalArgumentException("A hora de término não pode ser anterior à hora de início.");
+		}
+
 		if (dto.id() == null || dto.id() == 0) {
 			repository.save(mapper.toEntity(dto));
 		} else {
