@@ -31,7 +31,7 @@ public class OrganizadorController {
 			Organizador org = organizadorService.buscarPorId(id);
 			dto = organizadorMapper.toDTO(org);
 		} else {
-			dto = new DadosOrganizador(null, "", "", "");
+			dto = new DadosOrganizador(null, "", "", "", "");
 		}
 		model.addAttribute("organizador", dto);
 		return "organizador/formulario";

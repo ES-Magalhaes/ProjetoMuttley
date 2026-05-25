@@ -1,25 +1,22 @@
 package com.muttley.organizador;
 
 import com.muttley.evento.Evento;
-
+import com.muttley.pessoa.Pessoa; // Importação da classe pai
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
 
 @Entity
+@PrimaryKeyJoinColumn(name = "pessoa_id") // O ID da tabela Organizador apontará para o ID de Pessoa
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Organizador {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+public class Organizador extends Pessoa {
 
-	private String nome;
-	private String disciplinas;
-	private String qualificacoes;
+    // nome e id foram removidos pois são herdados de Pessoa
+    private String qualificacoes;
 
-	@OneToMany(mappedBy = "organizador")
-	private List<Evento> eventos;
+    @OneToMany(mappedBy = "organizador")
+    private List<Evento> eventos;
 }

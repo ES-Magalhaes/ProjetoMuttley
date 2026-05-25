@@ -2,6 +2,9 @@ package com.muttley.evento;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
+
+import com.muttley.pessoa.Pessoa;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import com.muttley.organizador.Organizador;
@@ -10,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,4 +47,7 @@ public class Evento {
 	@ManyToOne
 	@JoinColumn(name = "organizador_id")
 	private Organizador organizador;
+
+	@ManyToMany(mappedBy = "eventosInscritos")
+	private List<Pessoa> participantes;
 }
