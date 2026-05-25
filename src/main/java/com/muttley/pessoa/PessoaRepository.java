@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
     // Método para evitar que o mesmo CPF se inscreva duas vezes
-    boolean existsByCPF(String cpf);
+    boolean existsByCpf(String cpf);
 }
