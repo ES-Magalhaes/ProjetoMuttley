@@ -1,10 +1,9 @@
 package com.muttley.organizador;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
 
 @Service
 public class OrganizadorService {
@@ -15,28 +14,41 @@ public class OrganizadorService {
 	@Autowired
 	private OrganizadorMapper mapper;
 
-	public List<Organizador> listarTodos() {
-		return repository.findAll();
+	public List<DadosOrganizador> listarTodos() {
+		return repository.findAll().stream()
+				.map(mapper::toDto)
+				.toList();
+	}
+
+	public DadosOrganizador buscarParaEdicao(Long id) {
+		Organizador organizador = repository.findById(id)
+				.orElseThrow(() -> new RuntimeException("Organizador não encontrado"));
+		return mapper.toDto(organizador);
 	}
 
 	@Transactional
-	public Organizador salvarOuAtualizar(DadosOrganizador dto) {
-		if (dto.id() == null || dto.id() == 0) {
-			return repository.save(mapper.toEntity(dto));
-		} else {
-			Organizador existente = repository.findById(dto.id())
-					.orElseThrow(() -> new EntityNotFoundException("Organizador não encontrado"));
-			mapper.updateEntityFromDTO(dto, existente);
-			return repository.save(existente);
-		}
-	}
+	public void salvarOuAtualizar(DadosOrganizador dto) {
+		Organizador organizador;
 
-	public Organizador buscarPorId(Long id) {
-		return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Organizador não encontrado"));
+		if (dto.id() != null) {
+			organizador = repository.findById(dto.id())
+					.orElseThrow(() -> new RuntimeException("Organizador não encontrado"));
+			mapper.updateEntityFromDto(dto, organizador);
+		} else {
+			if (repository.existsByCpf(dto.cpf())) {
+				throw new RuntimeException("Já existe um organizador cadastrado com este CPF.");
+			}
+			organizador = mapper.toEntity(dto);
+		}
+
+		repository.save(organizador);
 	}
 
 	@Transactional
 	public void excluir(Long id) {
+		if (!repository.existsById(id)) {
+			throw new RuntimeException("Organizador não encontrado");
+		}
 		repository.deleteById(id);
 	}
 }

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragmentos/head :: head('QR Code do Evento')}"></head>
+  <body>
+    <header th:replace="~{fragmentos/header :: header(activePage='Evento')}"></header>
+
+    <div class="container mt-5 text-center" style="max-width: 600px; margin-bottom: 3rem;">
+      <div class="card shadow border-success">
+        <div class="card-header bg-success text-white">
+          <h3 class="card-title mb-0">
+            <i class="fa-solid fa-circle-check me-2"></i>Evento Salvo com Sucesso!
+          </h3>
+        </div>
+        <div class="card-body">
+          <h4 th:text="${evento.nome}" class="font-weight-bold text-dark mb-2"></h4>
+          <p class="text-muted small">
+            O QR Code institucional para divulgação e inscrições foi gerado dinamicamente.
+          </p>
+          
+          <div class="my-4">
+            <img th:src="'data:image/png;base64,' + ${evento.qrCodeBase64}" 
+                 alt="QR Code de Inscrição" 
+                 class="img-fluid border p-3 bg-white shadow-sm rounded" 
+                 style="max-width: 260px;"/>
+          </div>
+
+          <div class="alert alert-light border text-start mb-4">
+            <span class="font-weight-bold text-secondary d-block mb-1">Informações de Acesso rápido:</span>
+            <small class="d-block text-truncate">
+              <strong>URL de Inscrição:</strong> 
+              <a th:href="'http://localhost:8081/evento/inscrever/' + ${evento.id}" 
+                 th:text="'http://localhost:8081/evento/inscrever/' + ${evento.id}" 
+                 target="_blank" class="text-decoration-none text-primary"></a>
+            </small>
+            <small class="d-block mt-1">
+              <strong>Local/Plataforma:</strong> <span th:text="${evento.local}"></span>
+            </small>
+          </div>
+
+          <div class="d-flex justify-content-center border-top pt-3">
+            <a th:href="@{/evento}" class="btn btn-primary me-2">
+              <i class="fa-solid fa-list me-1"></i> Ir para a Listagem
+            </a>
+            <a th:href="@{/evento/formulario}" class="btn btn-outline-secondary">
+              <i class="fa-solid fa-plus me-1"></i> Criar Outro Evento
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:replace="~{fragmentos/footer :: footer}"></div>
+  </body>
+</html>

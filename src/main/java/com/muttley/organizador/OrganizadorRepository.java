@@ -5,4 +5,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface OrganizadorRepository extends JpaRepository<Organizador, Long> {
+    // Caso precise validar duplicidade no painel administrativo
+    boolean existsByCpf(String cpf);
 }
