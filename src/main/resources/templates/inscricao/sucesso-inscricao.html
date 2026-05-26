@@ -1,0 +1,48 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragmentos/head :: head('Inscrição Confirmada')}"></head>
+  <body>
+    <header th:replace="~{fragmentos/header :: header}"></header>
+
+    <main class="container mt-5 text-center" style="max-width: 500px">
+      <div class="card shadow border-success">
+        <div class="card-body my-4">
+          <div class="mb-3 text-success">
+            <i class="bi bi-check-circle-fill" style="font-size: 3rem"></i>
+          </div>
+
+          <h2 class="card-title text-success mb-3" th:text="${mensagem}">
+            Inscrição Confirmada!
+          </h2>
+          <p class="text-muted">
+            Seu passaporte de entrada foi gerado com sucesso. Tire um print ou
+            salve o código abaixo.
+          </p>
+
+          <div class="bg-light p-3 my-4 d-inline-block rounded border">
+            <img
+              th:src="${'data:image/png;base64,' + qrCode}"
+              alt="QR Code de Inscrição"
+              class="img-fluid"
+              style="max-width: 250px"
+            />
+          </div>
+
+          <div class="alert alert-warning sm" role="alert">
+            <small
+              >Apresente este QR Code na portaria para validação do seu check-in
+              e garantia das suas horas e medalhas[cite: 14, 119, 120,
+              123].</small
+            >
+          </div>
+
+          <div class="mt-4">
+            <a th:href="@{/evento}" class="btn btn-primary">Voltar ao Início</a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer th:replace="~{fragmentos/footer :: footer}"></footer>
+  </body>
+</html>

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragmentos/head :: head('Validação de Check-in')}"></head>
+  <body>
+    <header
+      th:replace="~{fragmentos/header :: header(activePage='Evento')}"
+    ></header>
+
+    <main class="container mt-5 text-center" style="max-width: 550px">
+      <div th:if="${status == 'OK'}" class="card shadow border-success">
+        <div class="card-body my-4">
+          <div class="mb-3 text-success">
+            <i class="fa-solid fa-circle-check" style="font-size: 3.5rem"></i>
+          </div>
+          <h2 class="card-title text-success mb-3">Presença Confirmada!</h2>
+          <div
+            class="alert alert-success border-0 bg-success bg-opacity-10 text-success-emphasis py-3 px-4"
+          >
+            <p class="mb-0 fw-bold" th:text="${mensagem}"></p>
+          </div>
+          <p class="text-muted small mt-2">
+            A presença do participante foi computada. As horas complementares
+            correspondentes serão liberadas.
+          </p>
+          <div class="mt-4">
+            <a th:href="@{/evento}" class="btn btn-success px-4"
+              >Voltar ao Painel</a
+            >
+          </div>
+        </div>
+      </div>
+
+      <div th:if="${status == 'ERRO'}" class="card shadow border-danger">
+        <div class="card-body my-4">
+          <div class="mb-3 text-danger">
+            <i class="fa-solid fa-circle-xmark" style="font-size: 3.5rem"></i>
+          </div>
+          <h2 class="card-title text-danger mb-3">Falha na Validação</h2>
+          <div
+            class="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger-emphasis py-3 px-4"
+          >
+            <p class="mb-0 fw-bold" th:text="${mensagem}"></p>
+          </div>
+          <p class="text-muted small mt-2">
+            Verifique se o QR Code lido é válido ou se a inscrição do aluno
+            realmente pertence a este evento.
+          </p>
+          <div class="mt-4">
+            <a th:href="@{/evento}" class="btn btn-danger px-4"
+              >Voltar ao Painel</a
+            >
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer th:replace="~{fragmentos/footer :: footer}"></footer>
+  </body>
+</html>

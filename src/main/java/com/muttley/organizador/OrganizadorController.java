@@ -1,12 +1,11 @@
 package com.muttley.organizador;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/organizador")
@@ -15,9 +14,6 @@ public class OrganizadorController {
 	@Autowired
 	private OrganizadorService organizadorService;
 
-	@Autowired
-	private OrganizadorMapper organizadorMapper;
-
 	@GetMapping
 	public String listar(Model model) {
 		model.addAttribute("organizadores", organizadorService.listarTodos());
@@ -25,42 +21,35 @@ public class OrganizadorController {
 	}
 
 	@GetMapping("/formulario")
-	public String mostrarFormulario(@RequestParam(required = false) Long id, Model model) {
-		DadosOrganizador dto;
-		if (id != null) {
-			Organizador org = organizadorService.buscarPorId(id);
-			dto = organizadorMapper.toDTO(org);
-		} else {
-			dto = new DadosOrganizador(null, "", "", "", "");
-		}
-		model.addAttribute("organizador", dto);
+	public String formulario(Model model) {
+		model.addAttribute("organizador", new DadosOrganizador(null, "", "", "", "", "", "", "", "", ""));
+		return "organizador/formulario";
+	}
+
+	@GetMapping("/formulario/{id}")
+	public String editar(@PathVariable Long id, Model model) {
+		model.addAttribute("organizador", organizadorService.buscarParaEdicao(id));
 		return "organizador/formulario";
 	}
 
 	@PostMapping("/salvar")
-	public String salvar(@ModelAttribute("organizador") @Valid DadosOrganizador dto, BindingResult result,
-			RedirectAttributes redirectAttributes) {
+	public String salvar(@Valid @ModelAttribute("organizador") DadosOrganizador dto, BindingResult result,
+			Model model) {
 		if (result.hasErrors()) {
 			return "organizador/formulario";
 		}
 		try {
 			organizadorService.salvarOuAtualizar(dto);
-			redirectAttributes.addFlashAttribute("message", "Organizador salvo com sucesso!");
 			return "redirect:/organizador";
 		} catch (Exception e) {
-			redirectAttributes.addFlashAttribute("error", "Erro ao salvar: " + e.getMessage());
-			return "redirect:/organizador";
+			model.addAttribute("erro", e.getMessage());
+			return "organizador/formulario";
 		}
 	}
 
 	@GetMapping("/delete/{id}")
-	public String deletar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-		try {
-			organizadorService.excluir(id);
-			redirectAttributes.addFlashAttribute("message", "Organizador removido!");
-		} catch (Exception e) {
-			redirectAttributes.addFlashAttribute("error", "Erro ao excluir.");
-		}
+	public String excluir(@PathVariable Long id) {
+		organizadorService.excluir(id);
 		return "redirect:/organizador";
 	}
 }

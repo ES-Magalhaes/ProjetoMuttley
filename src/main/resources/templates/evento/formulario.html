@@ -2,61 +2,70 @@
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
   <head th:replace="~{fragmentos/head :: head('Formulário de Evento')}"></head>
   <body>
-    <header
-      th:replace="~{fragmentos/header :: header(activePage='Evento')}"
-    ></header>
+    <header th:replace="~{fragmentos/header :: header(activePage='Evento')}"></header>
 
-    <div class="container mt-4" style="max-width: 700px">
+    <div class="container mt-4" style="max-width: 700px; margin-bottom: 3rem;">
       <div class="card shadow">
         <div class="card-header bg-primary text-white">
-          <h3
-            class="card-title mb-0"
-            th:text="${evento.id == null ? 'Novo Evento' : 'Editar Evento'}"
-          ></h3>
+          <h3 class="card-title mb-0"
+              th:text="${evento.id == null ? 'Novo Evento' : 'Editar Evento'}"></h3>
         </div>
         <div class="card-body">
-          <form
-            th:action="@{/evento/salvar}"
-            th:object="${evento}"
-            method="post"
-          >
+          <form th:action="@{/evento/salvar}" th:object="${evento}" method="post">
             <input type="hidden" th:field="*{id}" />
 
             <div class="form-group mb-3">
-              <label class="form-label font-weight-bold">Tema do Evento</label>
-              <input
-                type="text"
-                th:field="*{tema}"
-                class="form-control"
-                th:classappend="${#fields.hasErrors('tema')} ? 'is-invalid'"
-                placeholder="Ex: Workshop Spring Boot"
-              />
-              <div class="invalid-feedback" th:errors="*{tema}"></div>
+              <label class="form-label font-weight-bold">Nome do Evento</label>
+              <input type="text" th:field="*{nome}" class="form-control"
+                     th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid'"
+                     placeholder="Ex: Workshop Spring Boot Avançado" />
+              <div class="invalid-feedback" th:errors="*{nome}"></div>
             </div>
 
             <div class="form-group mb-3">
-              <label class="form-label font-weight-bold"
-                >Descrição do Evento</label
-              >
-              <input
-                type="text"
-                th:field="*{descricao}"
-                class="form-control"
-                th:classappend="${#fields.hasErrors('descricao')} ? 'is-invalid'"
-                placeholder="Ex: Workshop falando sobre aplicação e boas práticas do Springboot"
-              />
+              <label class="form-label font-weight-bold">Descrição do Evento</label>
+              <input type="text" th:field="*{descricao}" class="form-control"
+                     th:classappend="${#fields.hasErrors('descricao')} ? 'is-invalid'"
+                     placeholder="Ex: Workshop falando sobre aplicação e boas práticas do Spring Boot" />
               <div class="invalid-feedback" th:errors="*{descricao}"></div>
             </div>
 
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label font-weight-bold">Categoria</label>
+                  <select th:field="*{categoria}" class="form-control"
+                          th:classappend="${#fields.hasErrors('categoria')} ? 'is-invalid'">
+                    <option value="">Selecione uma categoria...</option>
+                    <option value="Palestra">Palestra</option>
+                    <option value="Workshop">Workshop</option>
+                    <option value="Curso">Curso</option>
+                    <option value="Seminário">Seminário</option>
+                    <option value="Hackathon">Hackathon</option>
+                  </select>
+                  <div class="invalid-feedback" th:errors="*{categoria}"></div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label font-weight-bold">Modalidade</label>
+                  <select th:field="*{modalidade}" class="form-control"
+                          th:classappend="${#fields.hasErrors('modalidade')} ? 'is-invalid'">
+                    <option value="">Selecione uma modalidade...</option>
+                    <option value="Presencial">Presencial</option>
+                    <option value="Online">Online</option>
+                    <option value="Híbrido">Híbrido</option>
+                  </select>
+                  <div class="invalid-feedback" th:errors="*{modalidade}"></div>
+                </div>
+              </div>
+            </div>
+
             <div class="form-group mb-3">
-              <label class="form-label font-weight-bold">Local</label>
-              <input
-                type="text"
-                th:field="*{local}"
-                class="form-control"
-                th:classappend="${#fields.hasErrors('local')} ? 'is-invalid'"
-                placeholder="Ex: Auditório ou URL do Meet"
-              />
+              <label class="form-label font-weight-bold">Local / Link</label>
+              <input type="text" th:field="*{local}" class="form-control"
+                     th:classappend="${#fields.hasErrors('local')} ? 'is-invalid'"
+                     placeholder="Ex: Auditório Principal ou URL do Microsoft Teams" />
               <div class="invalid-feedback" th:errors="*{local}"></div>
             </div>
 
@@ -64,66 +73,66 @@
               <div class="col-md-6">
                 <div class="form-group mb-3">
                   <label class="form-label font-weight-bold">Data</label>
-                  <input
-                    type="date"
-                    th:field="*{data}"
-                    class="form-control"
-                    th:classappend="${#fields.hasErrors('data')} ? 'is-invalid'"
-                  />
+                  <input type="date" th:field="*{data}" class="form-control"
+                         th:classappend="${#fields.hasErrors('data')} ? 'is-invalid'" />
                   <div class="invalid-feedback" th:errors="*{data}"></div>
                 </div>
               </div>
               <div class="col-md-3">
                 <div class="form-group mb-3">
                   <label class="form-label font-weight-bold">Início</label>
-                  <input
-                    type="time"
-                    th:field="*{horaInicio}"
-                    class="form-control"
-                    th:classappend="${#fields.hasErrors('horaInicio')} ? 'is-invalid'"
-                  />
+                  <input type="time" th:field="*{horaInicio}" class="form-control"
+                         th:classappend="${#fields.hasErrors('horaInicio')} ? 'is-invalid'" />
                   <div class="invalid-feedback" th:errors="*{horaInicio}"></div>
                 </div>
               </div>
               <div class="col-md-3">
                 <div class="form-group mb-3">
                   <label class="form-label font-weight-bold">Fim</label>
-                  <input
-                    type="time"
-                    th:field="*{horaFim}"
-                    class="form-control"
-                    th:classappend="${#fields.hasErrors('horaFim')} ? 'is-invalid'"
-                  />
+                  <input type="time" th:field="*{horaFim}" class="form-control"
+                         th:classappend="${#fields.hasErrors('horaFim')} ? 'is-invalid'" />
                   <div class="invalid-feedback" th:errors="*{horaFim}"></div>
                 </div>
               </div>
             </div>
 
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label font-weight-bold">Carga Horária (Horas)</label>
+                  <input type="number" th:field="*{cargaHoraria}" class="form-control" min="1"
+                         th:classappend="${#fields.hasErrors('cargaHoraria')} ? 'is-invalid'"
+                         placeholder="Ex: 4" />
+                  <div class="invalid-feedback" th:errors="*{cargaHoraria}"></div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label font-weight-bold">Quantidade de Vagas</label>
+                  <input type="number" th:field="*{numeroVagas}" class="form-control" min="1"
+                         th:classappend="${#fields.hasErrors('numeroVagas')} ? 'is-invalid'"
+                         placeholder="Ex: 80" />
+                  <div class="invalid-feedback" th:errors="*{numeroVagas}"></div>
+                </div>
+              </div>
+            </div>
+
             <div class="form-group mb-4">
-              <label class="form-label font-weight-bold"
-                >Organizador Responsável</label
-              >
-              <select
-                th:field="*{organizadorId}"
-                class="form-control"
-                th:classappend="${#fields.hasErrors('organizadorId')} ? 'is-invalid'"
-              >
+              <label class="form-label font-weight-bold">Organizador Responsável</label>
+              <select th:field="*{organizadorId}" class="form-control"
+                      th:classappend="${#fields.hasErrors('organizadorId')} ? 'is-invalid'">
                 <option value="">Selecione um organizador...</option>
-                <option
-                  th:each="o : ${organizadores}"
-                  th:value="${o.id}"
-                  th:text="${o.nome}"
-                ></option>
+                <option th:each="o : ${organizadores}"
+                        th:value="${o.id}"
+                        th:text="${o.nome}"></option>
               </select>
               <div class="invalid-feedback" th:errors="*{organizadorId}"></div>
             </div>
 
             <div class="d-flex justify-content-end border-top pt-3">
-              <a th:href="@{/evento}" class="btn btn-secondary mr-2"
-                >Cancelar</a
-              >
+              <a th:href="@{/evento}" class="btn btn-secondary me-2">Cancelar</a>
               <button type="submit" class="btn btn-success">
-                <i class="fa-solid fa-floppy-disk mr-1"></i> Salvar Evento
+                <i class="fa-solid fa-floppy-disk me-1"></i> Salvar Evento
               </button>
             </div>
           </form>
