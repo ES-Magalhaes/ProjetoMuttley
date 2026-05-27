@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import org.springframework.format.annotation.DateTimeFormat;
+
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -21,7 +23,7 @@ public record DadosEvento(
 
 		@NotBlank(message = "O local do evento é obrigatório") String local,
 
-		@NotNull(message = "A data do evento é obrigatória") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate data,
+		@NotNull(message = "A data do evento é obrigatória") @DateTimeFormat(pattern = "yyyy-MM-dd") @FutureOrPresent(message = "A data do evento deve ser uma data futura.") LocalDate data,
 
 		@NotNull(message = "A hora de início é obrigatória") @DateTimeFormat(pattern = "HH:mm") LocalTime horaInicio,
 

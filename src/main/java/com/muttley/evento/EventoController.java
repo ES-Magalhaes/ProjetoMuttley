@@ -104,10 +104,6 @@ public class EventoController {
 		return "redirect:/evento";
 	}
 
-	// =========================================================================
-	// ROTAS DE INSCRIÇÃO E CHECK-IN (Públicas / Alunos)
-	// =========================================================================
-
 	@GetMapping("/inscrever/{id}")
 	public String exibirFormularioInscricao(@PathVariable Long id, Model model) {
 		try {
