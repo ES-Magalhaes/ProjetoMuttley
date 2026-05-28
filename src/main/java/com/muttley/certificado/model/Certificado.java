@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import jakarta.annotation.Generated;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,6 +23,10 @@ public class Certificado {
     String cargaHoraria;
     String nomeAluno;
     String nomeCurso;
+
+    // Referência à inscrição que originou este certificado (evita duplicatas)
+    @Column(unique = true)
+    Long inscricaoId;
 
     public Certificado(){
 
@@ -82,5 +86,13 @@ public class Certificado {
 
     public void setNomeCurso(String nomeCurso) {
         this.nomeCurso = nomeCurso;
+    }
+
+    public Long getInscricaoId() {
+        return inscricaoId;
+    }
+
+    public void setInscricaoId(Long inscricaoId) {
+        this.inscricaoId = inscricaoId;
     }
 }

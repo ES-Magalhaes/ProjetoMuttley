@@ -40,9 +40,13 @@ public class PessoaService {
     }
 
     private Pessoa buscarOuCriarPessoa(DadosPessoa form) {
-        // Usa o Mapper para instanciar a pessoa inteira em uma linha
-        return pessoaRepository.findByCpf(form.cpf())
-                .orElseGet(() -> pessoaRepository.save(mapper.toEntity(form)));
+        // Remove formatação do CPF antes de qualquer operação
+        String cpfLimpo = form.cpf().replaceAll("\\D", "");
+        DadosPessoa formLimpo = new DadosPessoa(
+                form.id(), form.nome(), form.email(), cpfLimpo,
+                form.ra(), form.curso(), form.telefone());
+        return pessoaRepository.findByCpf(cpfLimpo)
+                .orElseGet(() -> pessoaRepository.save(mapper.toEntity(formLimpo)));
     }
 
     private void validarInscricaoInedita(Long pessoaId, Long eventoId) {
@@ -75,6 +79,11 @@ public class PessoaService {
                 .toList();
     }
 
+    public java.util.Optional<DadosPessoa> buscarPorCpf(String cpf) {
+        String cpfLimpo = cpf.replaceAll("\\D", "");
+        return pessoaRepository.findByCpf(cpfLimpo).map(mapper::toDto);
+    }
+
     public DadosPessoa buscarParaEdicao(Long id) {
         validarIdSeguro(id);
         Pessoa pessoa = pessoaRepository.findById(id)
@@ -84,16 +93,22 @@ public class PessoaService {
 
     @Transactional
     public void salvarOuAtualizar(DadosPessoa dto) {
-        if (dto.id() != null) {
-            Pessoa pessoa = pessoaRepository.findById(dto.id())
+        // Garante que o CPF é sempre salvo sem formatação
+        String cpfLimpo = dto.cpf().replaceAll("\\D", "");
+        DadosPessoa dtoLimpo = new DadosPessoa(
+                dto.id(), dto.nome(), dto.email(), cpfLimpo,
+                dto.ra(), dto.curso(), dto.telefone());
+
+        if (dtoLimpo.id() != null) {
+            Pessoa pessoa = pessoaRepository.findById(dtoLimpo.id())
                     .orElseThrow(() -> new RuntimeException("Pessoa não encontrada."));
-            mapper.updateEntityFromDto(dto, pessoa);
+            mapper.updateEntityFromDto(dtoLimpo, pessoa);
             pessoaRepository.save(pessoa);
         } else {
-            if (pessoaRepository.existsByCpf(dto.cpf())) {
+            if (pessoaRepository.existsByCpf(cpfLimpo)) {
                 throw new RuntimeException("Já existe uma pessoa cadastrada com este CPF.");
             }
-            pessoaRepository.save(mapper.toEntity(dto));
+            pessoaRepository.save(mapper.toEntity(dtoLimpo));
         }
     }
 

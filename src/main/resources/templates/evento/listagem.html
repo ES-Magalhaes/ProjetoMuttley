@@ -42,6 +42,20 @@
                 ></td>
                 <td class="text-center">
                   <a
+                    th:href="@{'/evento/qrcode/' + ${e.id}}"
+                    class="text-secondary me-3"
+                    title="QR Code de Inscrição"
+                  >
+                    <i class="fa-solid fa-qrcode"></i>
+                  </a>
+                  <a
+                    th:href="@{'/evento/participantes/' + ${e.id}}"
+                    class="text-success me-3"
+                    title="Ver Participantes"
+                  >
+                    <i class="fa-solid fa-users"></i>
+                  </a>
+                  <a
                     th:href="@{'/evento/formulario/' + ${e.id}}"
                     class="text-primary me-3"
                     title="Editar"

@@ -1,49 +1,112 @@
 package com.muttley.certificado.controller;
 
+import com.muttley.certificado.model.Certificado;
+import com.muttley.certificado.services.CertificadoService;
+import com.muttley.certificado.services.PdfService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
-import com.muttley.certificado.model.Certificado;
-import com.muttley.certificado.services.PdfService;
+import java.time.LocalDate;
 
-@RestController
-@RequestMapping("/api/certificados")
+@Controller
+@RequestMapping("/certificado")
 public class CertificadoController {
 
-    private final PdfService pdfService;
+    @Autowired
+    private CertificadoService certificadoService;
 
-    // O Spring injeta o seu PdfService automaticamente aqui
-    public CertificadoController(PdfService pdfService) {
-        this.pdfService = pdfService;
+    @Autowired
+    private PdfService pdfService;
+
+    // =========================================================================
+    // ROTAS DE TELA (Thymeleaf)
+    // =========================================================================
+
+    // GET /certificado — listagem de todos os certificados
+    @GetMapping
+    public String listarTodos(Model model) {
+        model.addAttribute("certificados", certificadoService.listarTodos());
+        return "certificado/listagem";
     }
 
-    @PostMapping("/gerar")
-    public ResponseEntity<byte[]> gerarCertificado(@RequestBody Certificado certificado) {
+    // GET /certificado/formulario — formulário para novo certificado
+    @GetMapping("/formulario")
+    public String exibirFormularioNovo(Model model) {
+        model.addAttribute("certificado", new Certificado());
+        return "certificado/formulario";
+    }
+
+    // GET /certificado/formulario/{id} — formulário preenchido para edição
+    @GetMapping("/formulario/{id}")
+    public String exibirFormularioEditar(@PathVariable Long id, Model model) {
+        model.addAttribute("certificado", certificadoService.buscarPorId(id));
+        return "certificado/formulario";
+    }
+
+    // POST /certificado/salvar — salva ou atualiza o certificado
+    @PostMapping("/salvar")
+    public String salvar(
+            @ModelAttribute Certificado certificado,
+            Model model) {
         try {
-            // 1. Chama o serviço que você criou para gerar o array de bytes do PDF
+            certificadoService.salvar(certificado);
+            return "redirect:/certificado";
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+            return "certificado/formulario";
+        }
+    }
+
+    // GET /certificado/delete/{id} — exclui o certificado
+    @GetMapping("/delete/{id}")
+    public String excluir(@PathVariable Long id) {
+        certificadoService.excluir(id);
+        return "redirect:/certificado";
+    }
+
+    // GET /certificado/gerar/{id} — gera e baixa o PDF do certificado
+    @GetMapping("/gerar/{id}")
+    public ResponseEntity<byte[]> gerarPdf(@PathVariable Long id) {
+        try {
+            Certificado certificado = certificadoService.buscarPorId(id);
             byte[] pdfBytes = pdfService.gerarCertificado(certificado);
 
-            // 2. Configura os cabeçalhos HTTP para indicar que a resposta é um arquivo de download
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
-            
-            // "attachment" força o navegador a baixar o arquivo. 
-            // Você também pode definir o nome padrão do arquivo aqui.
+            headers.setContentDispositionFormData("attachment",
+                    "certificado_" + certificado.getNomeAluno() + ".pdf");
+            headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // =========================================================================
+    // ROTA DE API (mantida para compatibilidade)
+    // =========================================================================
+
+    @PostMapping("/api/gerar")
+    @ResponseBody
+    public ResponseEntity<byte[]> gerarCertificadoApi(@RequestBody Certificado certificado) {
+        try {
+            byte[] pdfBytes = pdfService.gerarCertificado(certificado);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDispositionFormData("attachment", "certificado_de_participacao.pdf");
             headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
 
-            // 3. Retorna o PDF com o status 200 OK
             return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
-
         } catch (Exception e) {
-            // Caso aconteça algum erro na geração do HTML ou PDF, retorna o erro amigável
-            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

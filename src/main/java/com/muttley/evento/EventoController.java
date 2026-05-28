@@ -143,4 +143,17 @@ public class EventoController {
 		}
 		return "inscricao/checkin-inscricao";
 	}
+
+	@GetMapping("/participantes/{id}")
+	public String listarParticipantes(@PathVariable Long id, Model model) {
+		try {
+			Evento evento = eventoService.buscarPorId(id);
+			model.addAttribute("evento", evento);
+			model.addAttribute("inscricoes", inscricaoService.listarPorEvento(id));
+		} catch (Exception e) {
+			model.addAttribute("error", e.getMessage());
+			return "redirect:/evento";
+		}
+		return "evento/participantes";
+	}
 }
