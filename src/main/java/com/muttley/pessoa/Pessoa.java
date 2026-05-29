@@ -35,7 +35,7 @@ public class Pessoa {
     private String telefone;
 
     // Relacionamento um-para-múltos com a nova entidade intermediária de Inscrição
-    @OneToMany(mappedBy = "participante", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "participante", fetch = FetchType.LAZY)
     private List<Inscricao> inscricoes = new ArrayList<>();
 
     // Retorna o CPF formatado (000.000.000-00) para exibição nas telas

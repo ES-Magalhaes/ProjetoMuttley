@@ -3,7 +3,8 @@ package com.muttley.evento;
 import com.muttley.pessoa.DadosPessoa;
 import com.muttley.pessoa.PessoaService;
 import com.muttley.inscricao.InscricaoService;
-import com.muttley.organizador.OrganizadorService; // Certifique-se de importar o seu serviço de organizadores
+import com.muttley.competencia.CompetenciaRepository;
+import com.muttley.organizador.OrganizadorService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,7 +26,10 @@ public class EventoController {
 	private InscricaoService inscricaoService;
 
 	@Autowired
-	private OrganizadorService organizadorService; // Injetado para carregar a lista no <select> do formulário
+	private OrganizadorService organizadorService;
+
+	@Autowired
+	private CompetenciaRepository competenciaRepository;
 
 	// =========================================================================
 	// ROTAS DO CRUD DE EVENTOS (Adicionadas para corrigir o Erro 404)
@@ -38,23 +42,25 @@ public class EventoController {
 		return "evento/listagem"; // Alinhe com o nome real do seu arquivo (ex: evento/listagem ou evento/index)
 	}
 
-	// GET /evento/formulario - Abre o formulário para criar um NOVO evento
 	@GetMapping("/formulario")
 	public String exibirFormularioNovo(Model model) {
-		// Passa um DTO vazio inicializado com nulls/vazio para o th:object do Thymeleaf
-		model.addAttribute("evento", new DadosEvento(null, "", "", "", "", "", null, null, null, null, null, null));
+		model.addAttribute("evento", new DadosEvento(null, "", "", "", "", "", null, null, null, null, null, null, null));
 		model.addAttribute("organizadores", organizadorService.listarTodos());
+		model.addAttribute("todasCompetencias", competenciaRepository.findAll());
 		return "evento/formulario";
 	}
 
-	// GET /evento/formulario/{id} - Abre o formulário preenchido para EDITAR um
-	// evento
 	@GetMapping("/formulario/{id}")
 	public String exibirFormularioEditar(@PathVariable Long id, Model model) {
 		try {
 			DadosEvento dto = eventoService.buscarParaEdicao(id);
 			model.addAttribute("evento", dto);
 			model.addAttribute("organizadores", organizadorService.listarTodos());
+			model.addAttribute("todasCompetencias", competenciaRepository.findAll());
+			// IDs das competências já associadas ao evento
+			model.addAttribute("competenciasSelecionadas",
+				eventoService.buscarPorId(id).getCompetencias().stream()
+					.map(c -> c.getId()).toList());
 			return "evento/formulario";
 		} catch (Exception e) {
 			model.addAttribute("error", e.getMessage());

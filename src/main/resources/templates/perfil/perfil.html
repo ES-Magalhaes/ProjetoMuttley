@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/head :: head('Perfil do Participante')}"></head>
+<body>
+<header th:replace="~{fragmentos/header :: header(activePage='Pessoa')}"></header>
+
+<div class="container mt-4" style="max-width: 900px;">
+
+    <!-- Cabeçalho do perfil -->
+    <div class="card shadow-sm mb-4" style="border-radius:12px; overflow:hidden;">
+        <div style="background:linear-gradient(135deg, #2c3e50, #27ae60); padding:24px 32px; color:#fff;">
+            <div style="display:flex; align-items:center; gap:20px;">
+                <div style="width:80px; height:80px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:2rem;">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+                <div>
+                    <h2 style="margin:0;" th:text="${pessoa.nome}"></h2>
+                    <p style="margin:4px 0 0; opacity:0.9;">
+                        <span th:if="${pessoa.curso != null}" th:text="${pessoa.curso}"></span>
+                        <span th:if="${pessoa.ra != null}"> &mdash; RA: <span th:text="${pessoa.ra}"></span></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div style="padding:20px 32px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <div>
+                    <small style="color:#888; font-weight:600;">E-mail</small>
+                    <p style="margin:2px 0;" th:text="${pessoa.email}"></p>
+                </div>
+                <div>
+                    <small style="color:#888; font-weight:600;">CPF</small>
+                    <p style="margin:2px 0;" th:text="${pessoa.cpfFormatado}"></p>
+                </div>
+                <div th:if="${pessoa.telefone != null and !pessoa.telefone.isEmpty()}">
+                    <small style="color:#888; font-weight:600;">Telefone</small>
+                    <p style="margin:2px 0;" th:text="${pessoa.telefone}"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumo -->
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:24px;">
+        <div class="card text-center shadow-sm" style="border-radius:10px;">
+            <div style="padding:16px;">
+                <div style="font-size:2rem; font-weight:700; color:#F5A623;" th:text="${totalMedalhas}"></div>
+                <div style="color:#888;">Medalhas</div>
+            </div>
+        </div>
+        <div class="card text-center shadow-sm" style="border-radius:10px;">
+            <div style="padding:16px;">
+                <div style="font-size:2rem; font-weight:700; color:#27ae60;" th:text="${totalHoras + 'h'}"></div>
+                <div style="color:#888;">Horas complementares</div>
+            </div>
+        </div>
+        <div class="card text-center shadow-sm" style="border-radius:10px;">
+            <div style="padding:16px;">
+                <div style="font-size:2rem; font-weight:700; color:#3498db;" th:text="${historico.size()}"></div>
+                <div style="color:#888;">Eventos</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Medalhas -->
+    <div class="card shadow-sm mb-4" style="border-radius:10px; overflow:hidden;">
+        <div style="background:#F5A623; color:#fff; padding:12px 20px; font-weight:600;">
+            <i class="fa-solid fa-medal me-2"></i> Medalhas
+        </div>
+        <div style="padding:16px;">
+            <div th:if="${medalhas.isEmpty()}" style="text-align:center; color:#888; padding:8px;">
+                Nenhuma medalha conquistada ainda.
+            </div>
+            <div th:unless="${medalhas.isEmpty()}" style="display:flex; flex-wrap:wrap; gap:12px;">
+                <div th:each="m : ${medalhas}" style="background:#fff9e6; border:1px solid #F5A623; border-radius:8px; padding:12px 16px; min-width:180px; text-align:center;">
+                    <div style="font-size:1.5rem; color:#F5A623;"><i class="fa-solid fa-medal"></i></div>
+                    <div style="font-weight:600; font-size:0.85rem;" th:text="${m.tipo.descricao}"></div>
+                    <div style="color:#888; font-size:0.8rem;" th:text="${m.evento.nome}"></div>
+                    <div style="color:#aaa; font-size:0.75rem;" th:text="${#temporals.format(m.dataConcessao, 'dd/MM/yyyy')}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Histórico de eventos -->
+    <div class="card shadow-sm" style="border-radius:10px; overflow:hidden;">
+        <div style="background:#2c3e50; color:#fff; padding:12px 20px; font-weight:600;">
+            <i class="fa-solid fa-calendar-check me-2"></i> Histórico de Eventos
+        </div>
+        <div th:if="${historico.isEmpty()}" style="padding:20px; text-align:center; color:#888;">
+            Nenhum evento registrado.
+        </div>
+        <div th:unless="${historico.isEmpty()}" style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse;">
+                <thead style="background:#f8f9fa;">
+                    <tr>
+                        <th style="padding:10px 16px; text-align:left;">Evento</th>
+                        <th style="padding:10px 16px; text-align:center;">Data</th>
+                        <th style="padding:10px 16px; text-align:center;">Carga Horária</th>
+                        <th style="padding:10px 16px; text-align:center;">Presença</th>
+                        <th style="padding:10px 16px; text-align:left;">Competências</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="i : ${historico}" style="border-bottom:1px solid #eee;">
+                        <td style="padding:10px 16px; font-weight:600;" th:text="${i.evento.nome}"></td>
+                        <td style="padding:10px 16px; text-align:center;" th:text="${#temporals.format(i.evento.data, 'dd/MM/yyyy')}"></td>
+                        <td style="padding:10px 16px; text-align:center;" th:text="${i.evento.cargaHoraria != null ? i.evento.cargaHoraria + 'h' : '-'}"></td>
+                        <td style="padding:10px 16px; text-align:center;">
+                            <span th:if="${i.presencaConfirmada}" style="background:#28a745; color:#fff; padding:3px 8px; border-radius:10px; font-size:0.75rem;">Confirmada</span>
+                            <span th:unless="${i.presencaConfirmada}" style="background:#ffc107; color:#333; padding:3px 8px; border-radius:10px; font-size:0.75rem;">Pendente</span>
+                        </td>
+                        <td style="padding:10px 16px;">
+                            <span th:each="c : ${i.evento.competencias}"
+                                  th:text="${c.nome}"
+                                  style="background:#6c757d; color:#fff; padding:2px 8px; border-radius:10px; font-size:0.7rem; margin-right:4px; display:inline-block;"></span>
+                            <span th:if="${i.evento.competencias.isEmpty()}" style="color:#aaa; font-size:0.8rem;">—</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- LinkedIn -->
+    <div style="margin-top:20px; padding:16px 20px; background:#f0f8ff; border:1px solid #d0e8ff; border-radius:10px; display:flex; align-items:center; gap:12px;">
+        <i class="fa-brands fa-linkedin" style="font-size:1.5rem; color:#0077b5;"></i>
+        <div>
+            <strong>Compartilhe no LinkedIn</strong>
+            <div style="font-size:0.85rem; color:#666;">
+                URL pública: <code th:text="'http://localhost:8081/perfil/' + ${pessoa.id}"></code>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voltar -->
+    <div style="margin-top:16px; margin-bottom:32px;">
+        <a th:href="@{/pessoa}" style="text-decoration:none; color:#6c757d;">
+            <i class="fa-solid fa-arrow-left me-1"></i> Voltar para Participantes
+        </a>
+    </div>
+
+</div>
+
+<div th:replace="~{fragmentos/footer :: footer}"></div>
+</body>
+</html>

@@ -41,7 +41,14 @@
                     <option value="Workshop">Workshop</option>
                     <option value="Curso">Curso</option>
                     <option value="Seminário">Seminário</option>
+                    <option value="Congresso">Congresso</option>
+                    <option value="Semana Acadêmica">Semana Acadêmica</option>
+                    <option value="Treinamento">Treinamento</option>
+                    <option value="Extensão">Extensão</option>
                     <option value="Hackathon">Hackathon</option>
+                    <option value="Projeto">Projeto</option>
+                    <option value="Monitoria">Monitoria</option>
+                    <option value="Organização de Evento">Organização de Evento</option>
                   </select>
                   <div class="invalid-feedback" th:errors="*{categoria}"></div>
                 </div>
@@ -128,6 +135,123 @@
               </select>
               <div class="invalid-feedback" th:errors="*{organizadorId}"></div>
             </div>
+
+            <!-- Competências do evento -->
+            <div class="form-group mb-4">
+              <label class="form-label font-weight-bold">Competências Desenvolvidas</label>
+
+              <!-- Campo de pesquisa -->
+              <div class="input-group mb-2">
+                <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <input type="text" id="buscaCompetencia" class="form-control"
+                       placeholder="Pesquisar competência..." autocomplete="off" />
+              </div>
+
+              <!-- Lista de resultados (só aparece quando digita) -->
+              <div id="listaCompetencias" class="border rounded bg-white shadow-sm d-none" style="max-height:180px; overflow-y:auto; position:relative; z-index:10;">
+                <div th:each="c : ${todasCompetencias}" class="comp-item d-flex align-items-center justify-content-between px-3 py-2 border-bottom"
+                     th:data-nome="${c.nome}" th:data-tipo="${c.tipo.name()}" th:data-id="${c.id}" style="cursor:pointer;">
+                  <span th:text="${c.nome}"></span>
+                  <i class="fa-solid fa-plus text-success"></i>
+                </div>
+                <div id="semResultados" class="text-muted text-center py-2 d-none">
+                  Nenhum resultado.
+                </div>
+              </div>
+
+              <!-- Competências selecionadas -->
+              <div id="competenciasSelecionadas" class="d-flex flex-wrap gap-2 mt-2"></div>
+
+              <!-- Inputs hidden -->
+              <div id="hiddenInputsCompetencias"></div>
+            </div>
+
+            <!-- Script de competências -->
+            <script th:inline="javascript">
+              document.addEventListener('DOMContentLoaded', function() {
+                const busca = document.getElementById('buscaCompetencia');
+                const lista = document.getElementById('listaCompetencias');
+                const items = lista.querySelectorAll('.comp-item');
+                const selecionadasDiv = document.getElementById('competenciasSelecionadas');
+                const hiddenDiv = document.getElementById('hiddenInputsCompetencias');
+                const semResultados = document.getElementById('semResultados');
+
+                const preSelecionados = /*[[${competenciasSelecionadas != null ? competenciasSelecionadas : {}}]]*/ [];
+                let selecionados = new Set(preSelecionados.map(id => String(id)));
+
+                function render() {
+                  selecionadasDiv.innerHTML = '';
+                  hiddenDiv.innerHTML = '';
+                  selecionados.forEach(id => {
+                    const item = lista.querySelector('.comp-item[data-id="' + id + '"]');
+                    if (!item) return;
+                    const nome = item.dataset.nome;
+
+                    // Chip com botão remover
+                    const chip = document.createElement('span');
+                    chip.className = 'badge bg-primary d-inline-flex align-items-center gap-2 py-2 px-3';
+                    chip.style.fontSize = '0.85rem';
+                    chip.innerHTML = nome +
+                      '<i class="fa-solid fa-xmark" style="cursor:pointer;" data-id="' + id + '"></i>';
+                    chip.querySelector('.fa-xmark').addEventListener('click', function() {
+                      selecionados.delete(this.dataset.id);
+                      render();
+                    });
+                    selecionadasDiv.appendChild(chip);
+
+                    // Hidden input
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'competenciaIds';
+                    input.value = id;
+                    hiddenDiv.appendChild(input);
+                  });
+                  filtrar();
+                }
+
+                function filtrar() {
+                  const termo = busca.value.toLowerCase();
+                  let visivel = 0;
+                  items.forEach(item => {
+                    const jaAdicionado = selecionados.has(item.dataset.id);
+                    const matchTermo = item.dataset.nome.toLowerCase().includes(termo);
+                    const mostrar = !jaAdicionado && matchTermo;
+                    item.style.display = mostrar ? '' : 'none';
+                    if (mostrar) visivel++;
+                  });
+                  semResultados.classList.toggle('d-none', visivel > 0);
+                }
+
+                // Mostra lista ao focar/digitar
+                busca.addEventListener('focus', function() {
+                  lista.classList.remove('d-none');
+                  filtrar();
+                });
+                busca.addEventListener('input', function() {
+                  lista.classList.remove('d-none');
+                  filtrar();
+                });
+
+                // Esconde lista ao clicar fora
+                document.addEventListener('click', function(e) {
+                  if (!busca.contains(e.target) && !lista.contains(e.target)) {
+                    lista.classList.add('d-none');
+                  }
+                });
+
+                // Adicionar ao clicar no item
+                items.forEach(item => {
+                  item.addEventListener('click', function() {
+                    selecionados.add(this.dataset.id);
+                    busca.value = '';
+                    render();
+                  });
+                });
+
+                // Inicializar
+                render();
+              });
+            </script>
 
             <div class="d-flex justify-content-end border-top pt-3">
               <a th:href="@{/evento}" class="btn btn-secondary me-2">Cancelar</a>

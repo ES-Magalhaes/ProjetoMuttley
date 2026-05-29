@@ -13,4 +13,7 @@ public interface InscricaoRepository extends JpaRepository<Inscricao, Long> {
 
     // Busca todas as inscrições de um evento específico
     List<Inscricao> findByEventoId(Long eventoId);
+
+    // Busca todas as inscrições de um participante (histórico)
+    List<Inscricao> findByParticipanteId(Long participanteId);
 }

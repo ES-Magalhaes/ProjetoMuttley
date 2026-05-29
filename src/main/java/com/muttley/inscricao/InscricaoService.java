@@ -5,6 +5,7 @@ import com.muttley.certificado.repository.CertificadoRepository;
 import com.muttley.certificado.services.PdfService;
 import com.muttley.email.EmailService;
 import com.muttley.evento.Evento;
+import com.muttley.medalha.MedalhaService;
 import com.muttley.pessoa.Pessoa;
 import com.muttley.pessoa.PessoaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ public class InscricaoService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private MedalhaService medalhaService;
+
     public java.util.List<Inscricao> listarPorEvento(Long eventoId) {
         return inscricaoRepository.findByEventoId(eventoId);
     }
@@ -51,6 +55,9 @@ public class InscricaoService {
             Certificado certificado = gerarCertificado(inscricao);
             dispararEmailComCertificado(certificado, inscricao.getParticipante().getEmail());
         }
+
+        // Concede medalhas automaticamente conforme critérios
+        medalhaService.processarMedalhasCheckIn(inscricao);
     }
 
     private Certificado gerarCertificado(Inscricao inscricao) {
@@ -80,8 +87,9 @@ public class InscricaoService {
             emailService.enviarCertificadoPorEmail(
                     emailDestinatario,
                     certificado.getNomeAluno(),
-                    certificado.getTema(),
-                    pdfBytes
+                    certificado.getNomeCurso(),
+                    pdfBytes,
+                    certificado.getId()
             );
         } catch (Exception e) {
             // Falha no envio de e-mail não deve reverter o check-in

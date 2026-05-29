@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/head :: head('Competência')}"></head>
+<body>
+<header th:replace="~{fragmentos/header :: header(activePage='Competencia')}"></header>
+
+<div class="container mt-4" style="max-width: 500px;">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title mb-0">
+                <span th:if="${competencia.id == null}">Nova Competência</span>
+                <span th:unless="${competencia.id == null}">Editar Competência</span>
+            </h3>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/competencia/salvar}" th:object="${competencia}" method="post">
+                <input type="hidden" th:field="*{id}" />
+
+                <div class="mb-3">
+                    <label class="form-label">Nome da Competência</label>
+                    <input type="text" th:field="*{nome}" class="form-control"
+                           placeholder="Ex: Comunicação, Excel, Liderança" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tipo</label>
+                    <select th:field="*{tipo}" class="form-select" required>
+                        <option value="">Selecione...</option>
+                        <option th:each="t : ${tipos}" th:value="${t}" th:text="${t == T(com.muttley.competencia.Competencia.TipoCompetencia).SOFT_SKILL ? 'Soft Skill' : 'Hard Skill'}"></option>
+                    </select>
+                </div>
+
+                <div class="d-flex gap-2 justify-content-end mt-4">
+                    <a th:href="@{/competencia}" class="btn btn-secondary">
+                        <i class="fa-solid fa-arrow-left"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa-solid fa-floppy-disk"></i> Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragmentos/footer :: footer}"></div>
+</body>
+</html>

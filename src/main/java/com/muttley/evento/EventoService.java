@@ -1,5 +1,8 @@
 package com.muttley.evento;
 
+import com.muttley.competencia.Competencia;
+import com.muttley.competencia.CompetenciaRepository;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,9 @@ public class EventoService {
 	@Autowired
 	private QrCodeService qrCodeService;
 
+	@Autowired
+	private CompetenciaRepository competenciaRepository;
+
 	public List<Evento> listarTodos() {
 		return repository.findAll();
 	}
@@ -30,19 +36,30 @@ public class EventoService {
 
 		if (dto.id() == null || dto.id() == 0) {
 			Evento novoEvento = mapper.toEntity(dto);
-			novoEvento = repository.save(novoEvento); // Salva para gerar o ID
+			aplicarCompetencias(novoEvento, dto.competenciaIds());
+			novoEvento = repository.save(novoEvento);
 
 			String urlInscricao = "http://localhost:8081/evento/inscrever/" + novoEvento.getId();
 			String qrCode = qrCodeService.gerarQrCodeBase64(urlInscricao, 250, 250);
 			novoEvento.setQrCodeBase64(qrCode);
 
-			return repository.save(novoEvento); // Retorna a entidade salva com o QR Code
+			return repository.save(novoEvento);
 		} else {
 			Evento existente = repository.findById(dto.id())
 					.orElseThrow(() -> new RuntimeException("Evento não encontrado"));
 			mapper.updateEntityFromDTO(dto, existente);
-			return repository.save(existente); // Retorna a entidade atualizada
+			aplicarCompetencias(existente, dto.competenciaIds());
+			return repository.save(existente);
 		}
+	}
+
+	private void aplicarCompetencias(Evento evento, List<Long> ids) {
+		if (ids == null || ids.isEmpty()) {
+			evento.setCompetencias(new ArrayList<>());
+			return;
+		}
+		List<Competencia> competencias = competenciaRepository.findAllById(ids);
+		evento.setCompetencias(competencias);
 	}
 
 	public Evento buscarPorId(Long id) {

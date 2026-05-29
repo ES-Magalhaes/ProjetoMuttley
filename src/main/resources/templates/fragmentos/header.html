@@ -28,9 +28,24 @@
 					   id="link-eventos">Eventos</a>
 				</li>
 				<li class="nav-item">
+					<a th:href="@{/pessoa}"
+					   th:classappend="${activePage == 'Pessoa'} ? 'active'"
+					   id="link-participantes">Participantes</a>
+				</li>
+				<li class="nav-item">
 					<a th:href="@{/certificado}"
 					   th:classappend="${activePage == 'certificados'} ? 'active'"
 					   id="link-certificados">Certificados</a>
+				</li>
+				<li class="nav-item">
+					<a th:href="@{/medalha}"
+					   th:classappend="${activePage == 'Medalha'} ? 'active'"
+					   id="link-medalhas">Medalhas</a>
+				</li>
+				<li class="nav-item">
+					<a th:href="@{/competencia}"
+					   th:classappend="${activePage == 'Competencia'} ? 'active'"
+					   id="link-competencias">Competências</a>
 				</li>
 			</ul>
 		</nav>

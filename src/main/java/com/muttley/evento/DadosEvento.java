@@ -2,6 +2,7 @@ package com.muttley.evento;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -33,5 +34,8 @@ public record DadosEvento(
 
 		@NotNull(message = "O número de vagas é obrigatório") @Min(value = 1, message = "O número mínimo de vagas é 1") Integer numeroVagas,
 
-		@NotNull(message = "Selecione um organizador") Long organizadorId) {
+		@NotNull(message = "Selecione um organizador") Long organizadorId,
+
+		// IDs das competências associadas ao evento (opcional)
+		List<Long> competenciaIds) {
 }

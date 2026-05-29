@@ -18,4 +18,7 @@ public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
     // Busca a pessoa pelo ID carregando o tipo real da hierarquia (Pessoa ou Organizador)
     @Query("SELECT p FROM Pessoa p WHERE p.id = :id")
     Optional<Pessoa> findByIdComTipoReal(@Param("id") Long id);
+
+    @Query(value = "SELECT id FROM pessoas WHERE cpf = :cpf", nativeQuery = true)
+    java.util.Optional<Long> findIdByCpf(@Param("cpf") String cpf);
 }

@@ -42,11 +42,19 @@ public class PessoaService {
     private Pessoa buscarOuCriarPessoa(DadosPessoa form) {
         // Remove formatação do CPF antes de qualquer operação
         String cpfLimpo = form.cpf().replaceAll("\\D", "");
+
+        // Busca o ID via query nativa para evitar carregar proxy com tipo errado
+        java.util.Optional<Long> pessoaId = pessoaRepository.findIdByCpf(cpfLimpo);
+        if (pessoaId.isPresent()) {
+            return pessoaRepository.findById(pessoaId.get())
+                    .orElseThrow(() -> new RuntimeException("Pessoa não encontrada."));
+        }
+
+        // Cria nova pessoa
         DadosPessoa formLimpo = new DadosPessoa(
-                form.id(), form.nome(), form.email(), cpfLimpo,
+                null, form.nome(), form.email(), cpfLimpo,
                 form.ra(), form.curso(), form.telefone());
-        return pessoaRepository.findByCpf(cpfLimpo)
-                .orElseGet(() -> pessoaRepository.save(mapper.toEntity(formLimpo)));
+        return pessoaRepository.save(mapper.toEntity(formLimpo));
     }
 
     private void validarInscricaoInedita(Long pessoaId, Long eventoId) {

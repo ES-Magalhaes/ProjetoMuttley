@@ -48,6 +48,13 @@
               <td th:text="${org.miniCurriculo}"></td>
               <td class="text-center">
                 <a
+                  th:href="@{'/organizador/perfil/' + ${org.id}}"
+                  class="text-success mr-3"
+                  title="Ver Perfil"
+                >
+                  <i class="fa-solid fa-id-badge"></i>
+                </a>
+                <a
                   th:href="@{/organizador/formulario(id=${org.id})}"
                   class="text-primary mr-3"
                   title="Editar"

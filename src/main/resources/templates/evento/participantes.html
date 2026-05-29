@@ -72,6 +72,11 @@
                                 </span>
                             </td>
                             <td class="text-center">
+                                <a th:href="@{'/perfil/' + ${i.participante.id}}"
+                                   class="btn btn-sm btn-outline-secondary me-1"
+                                   title="Ver Perfil">
+                                    <i class="fa-solid fa-user"></i>
+                                </a>
                                 <a th:unless="${i.presencaConfirmada}"
                                    th:href="@{'/evento/checkin/' + ${i.id}}"
                                    class="btn btn-sm btn-outline-success"

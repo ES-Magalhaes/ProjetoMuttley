@@ -1,5 +1,7 @@
 package com.muttley.organizador;
 
+import com.muttley.evento.EventoRepository;
+import com.muttley.medalha.MedalhaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +15,15 @@ public class OrganizadorController {
 
 	@Autowired
 	private OrganizadorService organizadorService;
+
+	@Autowired
+	private OrganizadorRepository organizadorRepository;
+
+	@Autowired
+	private EventoRepository eventoRepository;
+
+	@Autowired
+	private MedalhaService medalhaService;
 
 	@GetMapping
 	public String listar(Model model) {
@@ -51,5 +62,16 @@ public class OrganizadorController {
 	public String excluir(@PathVariable Long id) {
 		organizadorService.excluir(id);
 		return "redirect:/organizador";
+	}
+
+	@GetMapping("/perfil/{id}")
+	public String perfil(@PathVariable Long id, Model model) {
+		Organizador organizador = organizadorRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("Organizador não encontrado."));
+		model.addAttribute("organizador", organizador);
+		model.addAttribute("eventos", eventoRepository.findByOrganizadorId(id));
+		model.addAttribute("medalhas", medalhaService.listarPorParticipante(id));
+		model.addAttribute("totalMedalhas", medalhaService.totalMedalhasPorParticipante(id));
+		return "organizador/perfil";
 	}
 }
