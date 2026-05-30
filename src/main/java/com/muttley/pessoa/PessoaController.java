@@ -55,8 +55,12 @@ public class PessoaController {
 
     // 5. Exclusão
     @GetMapping("/delete/{id}")
-    public String excluir(@PathVariable Long id) {
-        pessoaService.excluir(id);
+    public String excluir(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes ra) {
+        try {
+            pessoaService.excluir(id);
+        } catch (Exception e) {
+            ra.addFlashAttribute("erro", e.getMessage());
+        }
         return "redirect:/pessoa";
     }
 

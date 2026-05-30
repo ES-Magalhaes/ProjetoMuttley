@@ -74,6 +74,9 @@ public class EventoService {
 	@Autowired
 	private com.muttley.inscricao.InscricaoRepository inscricaoRepository;
 
+	@Autowired
+	private com.muttley.medalha.MedalhaRepository medalhaRepository;
+
 	@Transactional
 	public void excluir(Long id) {
 		if (!repository.existsById(id)) {
@@ -89,10 +92,21 @@ public class EventoService {
 					+ "Já existem participantes com check-in realizado.");
 		}
 
+		// Remove medalhas vinculadas ao evento
+		List<com.muttley.medalha.Medalha> medalhas = medalhaRepository.findByEventoId(id);
+		if (!medalhas.isEmpty()) {
+			medalhaRepository.deleteAll(medalhas);
+		}
+
 		// Remove inscrições pendentes (sem check-in) antes de excluir o evento
 		if (!inscricoes.isEmpty()) {
 			inscricaoRepository.deleteAll(inscricoes);
 		}
+
+		// Remove competências vinculadas (limpa a tabela join)
+		Evento evento = repository.findById(id).get();
+		evento.getCompetencias().clear();
+		repository.save(evento);
 
 		repository.deleteById(id);
 	}

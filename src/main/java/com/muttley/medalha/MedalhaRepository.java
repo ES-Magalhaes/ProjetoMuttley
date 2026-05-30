@@ -23,6 +23,8 @@ public interface MedalhaRepository extends JpaRepository<Medalha, Long> {
 
     List<Medalha> findByParticipanteId(Long pessoaId);
 
+    List<Medalha> findByEventoId(Long eventoId);
+
     List<Medalha> findAllByOrderByValidadaAscDataConcessaoDesc();
 
     List<Medalha> findByValidada(boolean validada);

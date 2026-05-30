@@ -20,6 +20,7 @@ public class PessoaService {
     private final InscricaoRepository inscricaoRepository;
     private final QrCodeService qrCodeService;
     private final PessoaMapper mapper;
+    private final com.muttley.medalha.MedalhaRepository medalhaRepository;
 
     @Transactional
     public String inscreverPessoaEmEvento(DadosPessoa form, Long eventoId) {
@@ -191,8 +192,22 @@ public class PessoaService {
         if (!pessoaRepository.existsById(id)) {
             throw new RuntimeException("Pessoa não encontrada.");
         }
-        // Remove todas as inscrições vinculadas para evitar constraint SQL
+
+        // Verifica se tem inscrições com check-in confirmado
         java.util.List<com.muttley.inscricao.Inscricao> inscricoes = inscricaoRepository.findByParticipanteId(id);
+        boolean temCheckin = inscricoes.stream().anyMatch(com.muttley.inscricao.Inscricao::isPresencaConfirmada);
+
+        if (temCheckin) {
+            throw new RuntimeException("Não é possível excluir este participante. "
+                    + "Ele possui check-in confirmado em um ou mais eventos.");
+        }
+
+        // Remove medalhas vinculadas ao participante
+        java.util.List<com.muttley.medalha.Medalha> medalhas = medalhaRepository.findByParticipanteId(id);
+        if (!medalhas.isEmpty()) {
+            medalhaRepository.deleteAll(medalhas);
+        }
+        // Remove inscrições pendentes (sem check-in)
         if (!inscricoes.isEmpty()) {
             inscricaoRepository.deleteAll(inscricoes);
         }

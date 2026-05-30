@@ -74,6 +74,9 @@ public class OrganizadorService {
 	@Autowired
 	private com.muttley.evento.EventoRepository eventoRepository;
 
+	@Autowired
+	private com.muttley.medalha.MedalhaRepository medalhaRepository;
+
 	@Transactional
 	public void excluir(Long id) {
 		if (!repository.existsById(id)) {
@@ -88,6 +91,11 @@ public class OrganizadorService {
 			throw new RuntimeException("Não é possível excluir este organizador. "
 					+ "Ele está vinculado aos seguintes eventos: " + nomesEventos
 					+ ". Remova o vínculo nos eventos antes de excluir.");
+		}
+		// Remove medalhas vinculadas ao organizador
+		java.util.List<com.muttley.medalha.Medalha> medalhas = medalhaRepository.findByParticipanteId(id);
+		if (!medalhas.isEmpty()) {
+			medalhaRepository.deleteAll(medalhas);
 		}
 		repository.deleteById(id);
 	}
