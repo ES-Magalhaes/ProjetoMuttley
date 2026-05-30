@@ -11,6 +11,12 @@ public interface InscricaoRepository extends JpaRepository<Inscricao, Long> {
     // Verifica se o aluno já se inscreveu neste evento específico
     boolean existsByParticipanteIdAndEventoId(Long participanteId, Long eventoId);
 
+    // Verifica se a pessoa tem alguma inscrição
+    boolean existsByParticipanteId(Long participanteId);
+
+    // Conta inscrições de um evento (para controle de vagas)
+    long countByEventoId(Long eventoId);
+
     // Busca todas as inscrições de um evento específico
     List<Inscricao> findByEventoId(Long eventoId);
 

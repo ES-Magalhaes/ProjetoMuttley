@@ -59,8 +59,12 @@ public class OrganizadorController {
 	}
 
 	@GetMapping("/delete/{id}")
-	public String excluir(@PathVariable Long id) {
-		organizadorService.excluir(id);
+	public String excluir(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes ra) {
+		try {
+			organizadorService.excluir(id);
+		} catch (Exception e) {
+			ra.addFlashAttribute("error", e.getMessage());
+		}
 		return "redirect:/organizador";
 	}
 
@@ -68,10 +72,16 @@ public class OrganizadorController {
 	public String perfil(@PathVariable Long id, Model model) {
 		Organizador organizador = organizadorRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("Organizador não encontrado."));
+
+		// Apenas medalhas validadas
+		java.util.List<com.muttley.medalha.Medalha> medalhasValidadas = medalhaService.listarPorParticipante(id).stream()
+				.filter(com.muttley.medalha.Medalha::isValidada)
+				.toList();
+
 		model.addAttribute("organizador", organizador);
 		model.addAttribute("eventos", eventoRepository.findByOrganizadorId(id));
-		model.addAttribute("medalhas", medalhaService.listarPorParticipante(id));
-		model.addAttribute("totalMedalhas", medalhaService.totalMedalhasPorParticipante(id));
+		model.addAttribute("medalhas", medalhasValidadas);
+		model.addAttribute("totalMedalhas", medalhasValidadas.size());
 		return "organizador/perfil";
 	}
 }

@@ -101,11 +101,12 @@ public class EventoController {
 
 	// GET /evento/delete/{id} - Exclui o evento do sistema
 	@GetMapping("/delete/{id}")
-	public String excluirEvento(@PathVariable Long id) {
+	public String excluirEvento(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes ra) {
 		try {
 			eventoService.excluir(id);
+			ra.addFlashAttribute("message", "Evento excluído com sucesso.");
 		} catch (Exception e) {
-			// Tratamento opcional se houver dependências vinculadas ao evento
+			ra.addFlashAttribute("error", e.getMessage());
 		}
 		return "redirect:/evento";
 	}

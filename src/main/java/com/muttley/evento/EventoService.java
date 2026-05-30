@@ -71,10 +71,29 @@ public class EventoService {
 		return mapper.toDTO(evento);
 	}
 
+	@Autowired
+	private com.muttley.inscricao.InscricaoRepository inscricaoRepository;
+
 	@Transactional
 	public void excluir(Long id) {
-		if (repository.existsById(id)) {
-			repository.deleteById(id);
+		if (!repository.existsById(id)) {
+			throw new RuntimeException("Evento não encontrado.");
 		}
+
+		// Verifica se algum participante já fez check-in
+		List<com.muttley.inscricao.Inscricao> inscricoes = inscricaoRepository.findByEventoId(id);
+		boolean temCheckin = inscricoes.stream().anyMatch(com.muttley.inscricao.Inscricao::isPresencaConfirmada);
+
+		if (temCheckin) {
+			throw new RuntimeException("Não é possível excluir este evento. "
+					+ "Já existem participantes com check-in realizado.");
+		}
+
+		// Remove inscrições pendentes (sem check-in) antes de excluir o evento
+		if (!inscricoes.isEmpty()) {
+			inscricaoRepository.deleteAll(inscricoes);
+		}
+
+		repository.deleteById(id);
 	}
 }

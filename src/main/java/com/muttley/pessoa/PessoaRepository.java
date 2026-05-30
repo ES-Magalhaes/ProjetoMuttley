@@ -21,4 +21,7 @@ public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
 
     @Query(value = "SELECT id FROM pessoas WHERE cpf = :cpf", nativeQuery = true)
     java.util.Optional<Long> findIdByCpf(@Param("cpf") String cpf);
+
+    @Query(value = "SELECT id FROM pessoas WHERE ra = :ra", nativeQuery = true)
+    java.util.Optional<Long> findIdByRa(@Param("ra") String ra);
 }
