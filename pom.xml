@@ -25,18 +25,35 @@
 	</properties>
 
 	<dependencies>
-			<!-- Motor de template para preencher o HTML com os dados do Java -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
-        </dependency>
 
-        <!-- Motor que pega o HTML e converte para PDF (versão OpenPDF) -->
-        <dependency>
-            <groupId>org.xhtmlrenderer</groupId>
-            <artifactId>flying-saucer-pdf-openpdf</artifactId>
-            <version>9.1.22</version>
-        </dependency>
+		<!-- Dependencias para autenticação de usuários Google Cloud OAuth -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-client</artifactId>
+		</dependency>
+
+		<!-- Dependencia para direcionar o usuário logado corretamente -->
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
+		</dependency>
+
+		<!-- Motor de template para preencher o HTML com os dados do Java -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+
+		<!-- Motor que pega o HTML e converte para PDF (versão OpenPDF) -->
+		<dependency>
+			<groupId>org.xhtmlrenderer</groupId>
+			<artifactId>flying-saucer-pdf-openpdf</artifactId>
+			<version>9.1.22</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -90,14 +107,14 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-    		<groupId>com.google.zxing</groupId>
-    		<artifactId>core</artifactId>
-    		<version>3.5.3</version>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>3.5.3</version>
 		</dependency>
 		<dependency>
-    		<groupId>com.google.zxing</groupId>
-    		<artifactId>javase</artifactId>
-    		<version>3.5.3</version>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>javase</artifactId>
+			<version>3.5.3</version>
 		</dependency>
 	</dependencies>
 

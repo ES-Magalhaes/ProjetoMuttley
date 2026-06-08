@@ -169,7 +169,6 @@ body {
     color: #fff;
     text-align: center;
     margin-bottom: 2.5rem;
-    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
     overflow: hidden;
 }

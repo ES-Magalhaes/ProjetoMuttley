@@ -22,6 +22,10 @@ public class PessoaService {
     private final PessoaMapper mapper;
     private final com.muttley.medalha.MedalhaRepository medalhaRepository;
 
+    // ADICIONE ISTO: O Spring vai injetar o link público do Ngrok
+    @org.springframework.beans.factory.annotation.Value("${muttley.url.base:http://localhost:8081}")
+    private String urlBase;
+
     @Transactional
     public String inscreverPessoaEmEvento(DadosPessoa form, Long eventoId) {
         Evento evento = buscarEventoOuFalhar(eventoId);
@@ -70,7 +74,7 @@ public class PessoaService {
         // Cria nova pessoa
         DadosPessoa formLimpo = new DadosPessoa(
                 null, form.nome(), form.email(), cpfLimpo,
-                form.ra(), form.curso(), form.telefone());
+                form.ra(), form.curso());
         return pessoaRepository.save(mapper.toEntity(formLimpo));
     }
 
@@ -99,7 +103,7 @@ public class PessoaService {
     }
 
     private String gerarEAtribuirQrCode(Inscricao inscricao) {
-        String urlCheckIn = "http://localhost:8081/evento/checkin/" + inscricao.getId();
+        String urlCheckIn = urlBase + "/evento/checkin/" + inscricao.getId();
         String qrCodeBase64 = qrCodeService.gerarQrCodeBase64(urlCheckIn, 250, 250);
 
         inscricao.setQrCodeBase64(qrCodeBase64);
@@ -140,7 +144,7 @@ public class PessoaService {
 
         DadosPessoa dtoLimpo = new DadosPessoa(
                 dto.id(), dto.nome(), dto.email(), cpfLimpo,
-                dto.ra(), dto.curso(), dto.telefone());
+                dto.ra(), dto.curso());
 
         if (dtoLimpo.id() != null) {
             Pessoa pessoa = pessoaRepository.findById(dtoLimpo.id())

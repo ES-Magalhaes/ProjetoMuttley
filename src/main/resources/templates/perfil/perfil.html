@@ -32,10 +32,6 @@
                     <small style="color:#888; font-weight:600;">CPF</small>
                     <p style="margin:2px 0;" th:text="${pessoa.cpfFormatado}"></p>
                 </div>
-                <div th:if="${pessoa.telefone != null and !pessoa.telefone.isEmpty()}">
-                    <small style="color:#888; font-weight:600;">Telefone</small>
-                    <p style="margin:2px 0;" th:text="${pessoa.telefone}"></p>
-                </div>
             </div>
         </div>
     </div>

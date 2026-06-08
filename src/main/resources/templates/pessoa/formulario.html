@@ -1,92 +1,102 @@
 <!DOCTYPE html>
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{fragmentos/head :: head('Participante')}"></head>
+
 <body>
-<header th:replace="~{fragmentos/header :: header(activePage='Pessoa')}"></header>
+    <header th:replace="~{fragmentos/header :: header(activePage='Pessoa')}"></header>
 
-<div class="container mt-4" style="max-width: 620px;">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h3 class="card-title mb-0">
-                <span th:if="${pessoa.id == null}">Novo Participante</span>
-                <span th:unless="${pessoa.id == null}">Editar Participante</span>
-            </h3>
-        </div>
-        <div class="card-body">
-
-            <div th:if="${erro != null}" class="alert alert-danger">
-                <i class="fa-solid fa-circle-exclamation me-1"></i> [[${erro}]]
+    <div class="container mt-4" style="max-width: 620px;">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">
+                    <span th:if="${pessoa.id == null}">Novo Participante</span>
+                    <span th:unless="${pessoa.id == null}">Editar Participante</span>
+                </h3>
             </div>
+            <div class="card-body">
 
-            <form th:action="@{/pessoa/salvar}" th:object="${pessoa}" method="post">
-                <input type="hidden" th:field="*{id}" />
-
-                <div class="mb-3">
-                    <label class="form-label">Nome Completo</label>
-                    <input type="text" th:field="*{nome}" class="form-control"
-                           th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid'"
-                           placeholder="Nome completo" required />
-                    <div class="invalid-feedback" th:errors="*{nome}"></div>
+                <div th:if="${erro != null}" class="alert alert-danger">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i> [[${erro}]]
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">E-mail</label>
-                    <input type="email" th:field="*{email}" class="form-control"
-                           th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
-                           placeholder="nome@fatec.sp.gov.br" required />
-                    <div class="invalid-feedback" th:errors="*{email}"></div>
-                </div>
+                <form th:action="@{/pessoa/salvar}" th:object="${pessoa}" method="post">
+                    <input type="hidden" th:field="*{id}" />
 
-                <div class="mb-3">
-                    <label class="form-label">CPF</label>
-                    <input type="text" th:field="*{cpf}" class="form-control" id="cpfInput"
-                           th:classappend="${#fields.hasErrors('cpf')} ? 'is-invalid'"
-                           placeholder="000.000.000-00" maxlength="14" required />
-                    <div class="invalid-feedback" th:errors="*{cpf}"></div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">RA</label>
-                        <input type="text" th:field="*{ra}" class="form-control"
-                               placeholder="Registro Acadêmico" />
+                    <div class="mb-3">
+                        <label class="form-label">Nome Completo</label>
+                        <input type="text" th:field="*{nome}" class="form-control"
+                            th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid'" placeholder="Nome completo"
+                            required />
+                        <div class="invalid-feedback" th:errors="*{nome}"></div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Curso</label>
-                        <input type="text" th:field="*{curso}" class="form-control"
-                               placeholder="Ex: DSM, GE, LOG" />
+
+                    <div class="mb-3">
+                        <label class="form-label">E-mail</label>
+                        <input type="email" th:field="*{email}" class="form-control"
+                            th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+                            placeholder="nome@fatec.sp.gov.br" required />
+                        <div class="invalid-feedback" th:errors="*{email}"></div>
                     </div>
-                </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Telefone / WhatsApp</label>
-                    <input type="text" th:field="*{telefone}" class="form-control"
-                           placeholder="(11) 99999-9999" />
-                </div>
+                    <div class="mb-3">
+                        <label class="form-label">CPF</label>
+                        <input type="text" th:field="*{cpf}" class="form-control" id="cpfInput"
+                            th:classappend="${#fields.hasErrors('cpf')} ? 'is-invalid'" placeholder="000.000.000-00"
+                            maxlength="14" required />
+                        <div class="invalid-feedback" th:errors="*{cpf}"></div>
+                    </div>
 
-                <div class="d-flex gap-2 justify-content-end mt-4">
-                    <a th:href="@{/pessoa}" class="btn btn-secondary">
-                        <i class="fa-solid fa-arrow-left"></i> Cancelar
-                    </a>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fa-solid fa-floppy-disk"></i> Salvar
-                    </button>
-                </div>
-            </form>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">RA</label>
+                            <input type="text" th:field="*{ra}" class="form-control" placeholder="Registro Acadêmico" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Curso</label>
+                            <!-- <input type="text" th:field="*{curso}" class="form-control"
+                               placeholder="Ex: DSM, GE, LOG" /> -->
+
+                            <select id="curso" class="form-control" th:field="*{curso}" required>
+                                <option value="" disabled selected>Selecione o seu curso...</option>
+
+                                <option value="Desenvolvimento de Software Multiplataforma">Desenvolvimento de Software
+                                    Multiplataforma (DSM)</option>
+                                <option value="Análise e Desenvolvimento de Sistemas">Análise e Desenvolvimento de
+                                    Sistemas (ADS)</option>
+                                <option value="Gestão de Recursos Humanos">Gestão de Recursos Humanos</option>
+                                <option value="Logística">Logística</option>
+                                <option value="Gestão Comercial">Gestão Comercial</option>
+                                <option value="Gestão da Produção Industrial">Gestão da Produção Industrial</option>
+                                <option value="Outro">Outro (Público Externo)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end mt-4">
+                        <a th:href="@{/pessoa}" class="btn btn-secondary">
+                            <i class="fa-solid fa-arrow-left"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa-solid fa-floppy-disk"></i> Salvar
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<div th:replace="~{fragmentos/footer :: footer}"></div>
+    <div th:replace="~{fragmentos/footer :: footer}"></div>
 
-<script>
-    document.getElementById('cpfInput').addEventListener('input', function () {
-        let v = this.value.replace(/\D/g, '');
-        v = v.replace(/(\d{3})(\d)/, '$1.$2');
-        v = v.replace(/(\d{3})(\d)/, '$1.$2');
-        v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-        this.value = v;
-    });
-</script>
+    <script>
+        document.getElementById('cpfInput').addEventListener('input', function () {
+            let v = this.value.replace(/\D/g, '');
+            v = v.replace(/(\d{3})(\d)/, '$1.$2');
+            v = v.replace(/(\d{3})(\d)/, '$1.$2');
+            v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            this.value = v;
+        });
+    </script>
 </body>
+
 </html>

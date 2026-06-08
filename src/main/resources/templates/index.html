@@ -1,139 +1,113 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="~{fragmentos/head :: head('Início - Projeto Muttley')}">
 </head>
 
 <body>
-	<header th:replace="~{fragmentos/header :: header(activePage='inicio')}"></header>
+    <header th:replace="~{fragmentos/header :: header(activePage='inicio')}"></header>
 
-	<main>
-		<section class="hero-section" th:style="'background-image: url(' + @{/images/boas_vindas_projeto_muttley.png} + ');'">
+    <main>
+        <section class="hero-section" th:style="'background-image: url(' + @{/images/boas_vindas_projeto_muttley.png} + ');'">
             <div class="hero-content">
                 <h1>Bem-vindo ao Projeto Muttley!</h1>
                 <p>O seu sistema definitivo de gerenciamento acadêmico. Aqui você pode organizar eventos de forma
-					inteligente, gerenciar alunos, cadastrar organizadores e emitir certificados diretamente na
-					plataforma. Navegue pelo menu acima para começar!</p>
+                    inteligente, gerenciar alunos, cadastrar organizadores e emitir certificados diretamente na
+                    plataforma. Navegue pelo menu acima para começar!</p>
+                
+                <div sec:authorize="!isAuthenticated()" style="margin-top: 30px;">
+                    <a th:href="@{/oauth2/authorization/google}" style="background-color: #4285F4; color: white; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-size: 1.2rem; font-weight: bold; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        <i class="fa-brands fa-google"></i> Começar a usar o sistema
+                    </a>
+                </div>
             </div>
         </section>
 
-		<section class="carrosel">
-			<div class="carousel-container">
-				<div class="carousel-track" id="carouselTrack">
-					<div class="carousel-slide">
-						<img src="/images/palestra01.webp" alt="Palestra 01">
-					</div>
-					<div class="carousel-slide">
-						<img src="/images/palestra02.webp" alt="Palestra 02">
-					</div>
-					<div class="carousel-slide">
-						<img src="/images/palestra03.jpg" alt="Palestra 03">
-					</div>
-				</div>
+        <div class="container" sec:authorize="isAuthenticated()">
+            <div class="features-grid">
+                
+                <a th:href="@{/evento}" th:classappend="${activePage == 'eventos'} ? 'active'" id="link-eventos"
+                    style="text-decoration: none;">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fa-solid fa-calendar-days" style="color: #4A90E2"></i></div>
+                        <h3>Gestão de Eventos</h3>
+                        <p>Planeje e execute eventos acadêmicos com eficiência, desde inscrições até a programação.</p>
+                    </div>
+                </a>
 
-				<button class="carousel-btn prev" id="btnPrev">
-					<i class="fa-solid fa-chevron-left"></i>
-				</button>
-				<button class="carousel-btn next" id="btnNext">
-					<i class="fa-solid fa-chevron-right"></i>
-				</button>
+                <a th:href="@{/medalha}" th:classappend="${activePage == 'medalhas'} ? 'active'" id="link-medalhas"
+                    style="text-decoration: none;">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fa-solid fa-medal" style="color: #F5A623"></i></div>
+                        <h3>Medalhas e Badges</h3>
+                        <p>Valide e gerencie as medalhas conquistadas pelos participantes nos eventos.</p>
+                    </div>
+                </a>
 
-				<div class="carousel-dots" id="carouselDots">
-					<span class="dot active"></span>
-					<span class="dot"></span>
-					<span class="dot"></span>
-				</div>
-			</div>
-		</section>
+                <a th:href="@{/organizador}" th:classappend="${activePage == 'organizadores'} ? 'active'"
+                    id="link-organizadores" style="text-decoration: none;">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fa-solid fa-users" style="color: #7ED321"></i></div>
+                        <h3>Gestão de Organizadores</h3>
+                        <p>Coordene palestrantes, monitores e equipes organizadoras de forma integrada.</p>
+                    </div>
+                </a>
 
-		<div class="container">
+                <a th:href="@{/certificado}" th:classappend="${activePage == 'certificados'} ? 'active'"
+                    id="link-certificados" style="text-decoration: none;">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fa-solid fa-certificate" style="color: #D0021B"></i></div>
+                        <h3>Certificados Automáticos</h3>
+                        <p>Emita e envie certificados de participação de forma ágil e automatizada.</p>
+                    </div>
+                </a>
 
-			<div class="features-grid">
-				<a th:href="@{/evento}" th:classappend="${activePage == 'eventos'} ? 'active'" id="link-eventos"
-					style="text-decoration: none;">
-					<div class="feature-card">
-						<div class="feature-icon"><i class="fa-solid fa-calendar-days" style="color: #4A90E2"></i></div>
-						<h3>Gestão de Eventos</h3>
-						<p>Planeje e execute eventos acadêmicos com eficiência, desde inscrições até a programação.</p>
-					</div>
-				</a>
+            </div>
+        </div>
+    </main>
 
+    <div th:replace="~{fragmentos/footer :: footer}"></div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const track = document.getElementById('carouselTrack');
+            // Só executa a lógica do carrossel se os elementos existirem na tela
+            if(track) {
+                const dots = document.querySelectorAll('.dot');
+                const total = document.querySelectorAll('.carousel-slide').length;
+                let current = 0;
+                let timer;
 
+                function goTo(index) {
+                    current = (index + total) % total;
+                    track.style.transform = `translateX(-${current * 100}%)`;
+                    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+                }
 
-				<a th:href="@{/medalha}" th:classappend="${activePage == 'medalhas'} ? 'active'" id="link-medalhas"
-					style="text-decoration: none;">
-					<div class="feature-card">
-						<div class="feature-icon"><i class="fa-solid fa-medal" style="color: #F5A623"></i></div>
-						<h3>Medalhas e Badges</h3>
-						<p>Valide e gerencie as medalhas conquistadas pelos participantes nos eventos.</p>
-					</div>
-				</a>
+                function next() { goTo(current + 1); }
+                function prev() { goTo(current - 1); }
 
+                function startAuto() {
+                    timer = setInterval(next, 4000);
+                }
 
-				<a th:href="@{/organizador}" th:classappend="${activePage == 'organizadores'} ? 'active'"
-					id="link-organizadores" style="text-decoration: none;">
-					<div class="feature-card">
-						<div class="feature-icon"><i class="fa-solid fa-users" style="color: #7ED321"></i></div>
-						<h3>Gestão de Organizadores</h3>
-						<p>Coordene palestrantes, monitores e equipes organizadoras de forma integrada.</p>
-					</div>
-				</a>
+                function resetAuto() {
+                    clearInterval(timer);
+                    startAuto();
+                }
 
+                const btnNext = document.getElementById('btnNext');
+                const btnPrev = document.getElementById('btnPrev');
 
-
-				<a th:href="@{/certificado}" th:classappend="${activePage == 'certificados'} ? 'active'"
-					id="link-certificados" style="text-decoration: none;">
-					<div class="feature-card">
-						<div class="feature-icon"><i class="fa-solid fa-certificate" style="color: #D0021B"></i></div>
-						<h3>Certificados Automáticos</h3>
-						<p>Emita e envie certificados de participação de forma ágil e automatizada.</p>
-					</div>
-				</a>
-
-
-
-			</div>
-		</div>
-	</main>
-
-	</main>
-
-	<div th:replace="~{fragmentos/footer :: footer}"></div>
-
-	<script>
-		document.addEventListener('DOMContentLoaded', () => {
-			const track = document.getElementById('carouselTrack');
-			const dots = document.querySelectorAll('.dot');
-			const total = document.querySelectorAll('.carousel-slide').length;
-			let current = 0;
-			let timer;
-
-			function goTo(index) {
-				current = (index + total) % total;
-				track.style.transform = `translateX(-${current * 100}%)`;
-				dots.forEach((d, i) => d.classList.toggle('active', i === current));
-			}
-
-			function next() { goTo(current + 1); }
-			function prev() { goTo(current - 1); }
-
-			function startAuto() {
-				timer = setInterval(next, 4000);
-			}
-
-			function resetAuto() {
-				clearInterval(timer);
-				startAuto();
-			}
-
-			document.getElementById('btnNext').addEventListener('click', () => { next(); resetAuto(); });
-			document.getElementById('btnPrev').addEventListener('click', () => { prev(); resetAuto(); });
-			dots.forEach((d, i) => d.addEventListener('click', () => { goTo(i); resetAuto(); }));
-
-			startAuto();
-		});
-	</script>
+                if(btnNext && btnPrev) {
+                    btnNext.addEventListener('click', () => { next(); resetAuto(); });
+                    btnPrev.addEventListener('click', () => { prev(); resetAuto(); });
+                    dots.forEach((d, i) => d.addEventListener('click', () => { goTo(i); resetAuto(); }));
+                    startAuto();
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

@@ -1,28 +1,26 @@
 <!DOCTYPE html>
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{fragmentos/head :: head('Listagem de Certificados')}"></head>
+
 <body>
     <header th:replace="~{fragmentos/header :: header(activePage='Certificado')}"></header>
 
-    <div class="container" style="max-width: 1000px;">
-        <div class="hero-section" th:style="'background-image: url(' + @{/images/certificado.png} + ');'">
-            <div class="hero-content">
-                <h1>Certificados Emitidos</h1>
-                <p>Visualize e gerencie os certificados emitidos no sistema Muttley.</p>
-            </div>
-        </div>
 
+
+
+    <div class="container" style="max-width: 1000px;">
+        <div class="header-crud">
+            <h2>Certificados Cadastrados</h2>
+             <a th:href="@{/certificado/formulario}" class="btn btn-primary shadow-sm">
+                <i class="fa-solid fa-plus mr-1"></i> Novo Certificado
+            </a>
+        </div>
         <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show text-center" role="alert">
             <i class="fa-solid fa-circle-exclamation mr-2"></i> [[${error}]]
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
-        </div>
-
-        <div class="mb-3 text-right">
-            <a th:href="@{/certificado/formulario}" class="btn btn-primary shadow-sm">
-                <i class="fa-solid fa-plus mr-1"></i> Novo Certificado
-            </a>
         </div>
 
         <div th:if="${!certificados.isEmpty()}" class="card shadow-sm">
@@ -48,17 +46,16 @@
                             <td class="text-center" th:text="${#temporals.format(c.data, 'dd/MM/yyyy')}"></td>
                             <td class="text-center" th:text="${c.cargaHoraria}"></td>
                             <td class="text-center">
-                                <a th:href="@{'/certificado/gerar/' + ${c.id}}"
-                                   title="Baixar PDF" class="text-success mr-3">
+                                <a th:href="@{'/certificado/gerar/' + ${c.id}}" title="Baixar PDF"
+                                    class="text-success mr-3">
                                     <i class="fa-solid fa-file-pdf"></i>
                                 </a>
-                                <a th:href="@{'/certificado/formulario/' + ${c.id}}"
-                                   title="Editar" class="text-primary mr-3">
+                                <a th:href="@{'/certificado/formulario/' + ${c.id}}" title="Editar"
+                                    class="text-primary mr-3">
                                     <i class="fa-regular fa-pen-to-square"></i>
                                 </a>
-                                <a th:href="@{'/certificado/delete/' + ${c.id}}"
-                                   title="Excluir" class="text-danger"
-                                   onclick="return confirm('Tem certeza que deseja excluir este certificado?')">
+                                <a th:href="@{'/certificado/delete/' + ${c.id}}" title="Excluir" class="text-danger"
+                                    onclick="return confirm('Tem certeza que deseja excluir este certificado?')">
                                     <i class="fa-regular fa-trash-can"></i>
                                 </a>
                             </td>
@@ -73,6 +70,7 @@
         </div>
     </div>
 
-    <div th:replace="~{fragmentos/footer :: footer}"></div>
+   
 </body>
+
 </html>

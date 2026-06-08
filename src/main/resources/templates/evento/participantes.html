@@ -4,7 +4,7 @@
 <body>
     <header th:replace="~{fragmentos/header :: header(activePage='Evento')}"></header>
 
-    <div class="container mt-4" style="max-width: 1000px;">
+    <div class="container-fluid mt-4" style="max-width: 1400px; padding-left: 15px; padding-right: 15px;">
 
         <!-- Cabeçalho com info do evento -->
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -73,14 +73,16 @@
                             </td>
                             <td class="text-center">
                                 <a th:href="@{'/perfil/' + ${i.participante.id}}"
-                                   class="btn btn-sm btn-outline-secondary me-1"
-                                   title="Ver Perfil">
+                                   class="btn btn-sm btn-outline-secondary"
+                                   title="Ver Perfil"
+                                   style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">
                                     <i class="fa-solid fa-user"></i>
                                 </a>
                                 <a th:unless="${i.presencaConfirmada}"
                                    th:href="@{'/evento/checkin/' + ${i.id}}"
                                    class="btn btn-sm btn-outline-success"
                                    title="Realizar Check-in"
+                                   style="padding: 0.25rem 0.5rem; font-size: 0.875rem; margin-left: 4px;"
                                    onclick="return confirm('Confirmar check-in deste participante?')">
                                     <i class="fa-solid fa-circle-check"></i> Check-in
                                 </a>
@@ -100,6 +102,5 @@
 
     </div>
 
-    <div th:replace="~{fragmentos/footer :: footer}"></div>
 </body>
 </html>

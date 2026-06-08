@@ -12,8 +12,7 @@ public class PessoaMapper {
                 entity.getEmail(),
                 entity.getCpf(),
                 entity.getRa(),
-                entity.getCurso(),
-                entity.getTelefone());
+                entity.getCurso());
     }
 
     public Pessoa toEntity(DadosPessoa dto) {
@@ -29,6 +28,5 @@ public class PessoaMapper {
         entity.setCpf(dto.cpf());
         entity.setRa(dto.ra());
         entity.setCurso(dto.curso());
-        entity.setTelefone(dto.telefone());
     }
 }

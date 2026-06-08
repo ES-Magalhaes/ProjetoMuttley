@@ -24,6 +24,10 @@ public class EventoService {
 	@Autowired
 	private CompetenciaRepository competenciaRepository;
 
+	// ADICIONE ISTO: A variável que vai receber o link do Ngrok
+    @org.springframework.beans.factory.annotation.Value("${muttley.url.base:http://localhost:8081}")
+    private String urlBase;
+
 	public List<Evento> listarTodos() {
 		return repository.findAll();
 	}
@@ -39,9 +43,10 @@ public class EventoService {
 			aplicarCompetencias(novoEvento, dto.competenciaIds());
 			novoEvento = repository.save(novoEvento);
 
-			String urlInscricao = "http://localhost:8081/evento/inscrever/" + novoEvento.getId();
-			String qrCode = qrCodeService.gerarQrCodeBase64(urlInscricao, 250, 250);
-			novoEvento.setQrCodeBase64(qrCode);
+			// MUDE ISTO: Usa a urlBase dinâmica em vez de chumbado "http://localhost..."
+            String urlInscricao = urlBase + "/evento/inscrever/" + novoEvento.getId();
+            String qrCode = qrCodeService.gerarQrCodeBase64(urlInscricao, 250, 250);
+            novoEvento.setQrCodeBase64(qrCode);
 
 			return repository.save(novoEvento);
 		} else {

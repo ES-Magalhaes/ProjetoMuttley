@@ -25,7 +25,7 @@ public class PessoaController {
     // 2. Abertura do formulário (vazio para novo registro)
     @GetMapping("/formulario")
     public String formulario(Model model) {
-        model.addAttribute("pessoa", new DadosPessoa(null, "", "", "", "", "", ""));
+        model.addAttribute("pessoa", new DadosPessoa(null, "", "", "", "", ""));
         return "pessoa/formulario";
     }
 

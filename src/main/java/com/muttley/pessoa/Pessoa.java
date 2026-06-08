@@ -32,7 +32,6 @@ public class Pessoa {
     // Dados específicos do participante/aluno exigidos pelo escopo
     private String ra;
     private String curso;
-    private String telefone;
 
     // Relacionamento um-para-múltos com a nova entidade intermediária de Inscrição
     @OneToMany(mappedBy = "participante", fetch = FetchType.LAZY)

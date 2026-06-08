@@ -116,7 +116,7 @@ public class EventoController {
 		try {
 			Evento evento = eventoService.buscarPorId(id);
 			model.addAttribute("evento", evento);
-			model.addAttribute("dadosPessoa", new DadosPessoa(null, "", "", "", "", "", null));
+			model.addAttribute("dadosPessoa", new DadosPessoa(null, "", "", "", "", ""));
 			return "inscricao/formulario-inscricao";
 		} catch (Exception e) {
 			model.addAttribute("error", "Evento não encontrado.");
