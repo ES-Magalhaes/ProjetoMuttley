@@ -24,9 +24,8 @@ public class EventoService {
 	@Autowired
 	private CompetenciaRepository competenciaRepository;
 
-	// ADICIONE ISTO: A variável que vai receber o link do Ngrok
-    @org.springframework.beans.factory.annotation.Value("${muttley.url.base:http://localhost:8081}")
-    private String urlBase;
+	@org.springframework.beans.factory.annotation.Value("${muttley.url.base:http://localhost:8081}")
+	private String urlBase;
 
 	public List<Evento> listarTodos() {
 		return repository.findAll();
@@ -43,10 +42,9 @@ public class EventoService {
 			aplicarCompetencias(novoEvento, dto.competenciaIds());
 			novoEvento = repository.save(novoEvento);
 
-			// MUDE ISTO: Usa a urlBase dinâmica em vez de chumbado "http://localhost..."
-            String urlInscricao = urlBase + "/evento/inscrever/" + novoEvento.getId();
-            String qrCode = qrCodeService.gerarQrCodeBase64(urlInscricao, 250, 250);
-            novoEvento.setQrCodeBase64(qrCode);
+			String urlInscricao = urlBase + "/evento/inscrever/" + novoEvento.getId();
+			String qrCode = qrCodeService.gerarQrCodeBase64(urlInscricao, 250, 250);
+			novoEvento.setQrCodeBase64(qrCode);
 
 			return repository.save(novoEvento);
 		} else {
@@ -79,9 +77,6 @@ public class EventoService {
 	@Autowired
 	private com.muttley.inscricao.InscricaoRepository inscricaoRepository;
 
-	@Autowired
-	private com.muttley.medalha.MedalhaRepository medalhaRepository;
-
 	@Transactional
 	public void excluir(Long id) {
 		if (!repository.existsById(id)) {
@@ -94,16 +89,10 @@ public class EventoService {
 
 		if (temCheckin) {
 			throw new RuntimeException("Não é possível excluir este evento. "
-					+ "Já existem participantes com check-in realizado.");
+					+ "Já existem participantes com check-in realizado e medalhas/certificados gerados.");
 		}
 
-		// Remove medalhas vinculadas ao evento
-		List<com.muttley.medalha.Medalha> medalhas = medalhaRepository.findByEventoId(id);
-		if (!medalhas.isEmpty()) {
-			medalhaRepository.deleteAll(medalhas);
-		}
-
-		// Remove inscrições pendentes (sem check-in) antes de excluir o evento
+		// Se não tem check-in, remove inscrições pendentes antes de excluir o evento
 		if (!inscricoes.isEmpty()) {
 			inscricaoRepository.deleteAll(inscricoes);
 		}

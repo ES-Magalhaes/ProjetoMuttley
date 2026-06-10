@@ -1,67 +1,45 @@
 package com.muttley.medalha;
 
-import com.muttley.evento.Evento;
-import com.muttley.pessoa.Pessoa;
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import com.muttley.pessoa.Pessoa;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Entity
 @Table(name = "medalhas")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter 
+@Setter 
+@NoArgsConstructor 
+@AllArgsConstructor 
 public class Medalha {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pessoa_id", nullable = false)
+    @Column(nullable = false)
+    private String nome;
+
+    @Column(nullable = false, length = 500)
+    private String descricao;
+
+    @Column(nullable = false)
+    private String icone;
+
+    @Column(nullable = false)
+    private String tipo;
+
+    @Column(name = "data_concessao")
+    private LocalDateTime dataConquista;
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "pessoa_id", nullable = true)
     private Pessoa participante;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "evento_id", nullable = false)
-    private Evento evento;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TipoMedalha tipo;
-
-    @Column(nullable = false)
-    private LocalDate dataConcessao;
-
-    // Referência à inscrição que originou esta medalha (evita duplicatas)
-    @Column(unique = true)
-    private Long inscricaoId;
-
-    // Controle de validação pelo administrador
-    @Column(nullable = false)
-    private boolean validada = false;
-
-    private String observacaoValidacao;
-
-    // Nome da competência (usado apenas para medalhas do tipo COMPETENCIA)
-    private String competenciaNome;
-
-    public enum TipoMedalha {
-        PARTICIPACAO("Medalha de Participação"),
-        CONCLUSAO("Medalha de Conclusão"),
-        ORGANIZACAO("Medalha de Organização"),
-        APRESENTACAO("Medalha de Apresentação"),
-        COMPETENCIA("Medalha de Competência");
-
-        private final String descricao;
-
-        TipoMedalha(String descricao) {
-            this.descricao = descricao;
-        }
-
-        public String getDescricao() {
-            return descricao;
-        }
-    }
+    // NOVO CAMPO: Controla se a medalha está ativa/aprovada no sistema
+    @Column(nullable = false, length = 20)
+    private String status = "PENDENTE"; // Valor padrão inicial
 }

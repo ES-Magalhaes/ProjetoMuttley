@@ -3,6 +3,7 @@ package com.muttley.pessoa;
 import com.muttley.inscricao.InscricaoRepository;
 import com.muttley.medalha.Medalha;
 import com.muttley.medalha.MedalhaService;
+import com.muttley.medalha.MedalhaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +22,9 @@ public class PerfilController {
     private MedalhaService medalhaService;
 
     @Autowired
+    private MedalhaRepository medalhaRepository;
+
+    @Autowired
     private InscricaoRepository inscricaoRepository;
 
     @GetMapping("/{id}")
@@ -28,15 +32,16 @@ public class PerfilController {
         Pessoa pessoa = pessoaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Participante não encontrado."));
 
-        // Apenas medalhas validadas
-        List<Medalha> medalhasValidadas = medalhaService.listarPorParticipante(id).stream()
-                .filter(Medalha::isValidada)
-                .toList();
+        // Busca todas as medalhas conquistadas
+        List<Medalha> medalhas = medalhaService.listarPorParticipante(id);
+
+        // Calcula o total de horas em eventos com check-in
+        int totalHoras = medalhaRepository.sumCargaHorariaPorParticipante(id);
 
         model.addAttribute("pessoa", pessoa);
-        model.addAttribute("medalhas", medalhasValidadas);
-        model.addAttribute("totalHoras", medalhaService.totalHorasPorParticipante(id));
-        model.addAttribute("totalMedalhas", medalhasValidadas.size());
+        model.addAttribute("medalhas", medalhas);
+        model.addAttribute("totalHoras", totalHoras);
+        model.addAttribute("totalMedalhas", medalhas.size());
         model.addAttribute("historico", inscricaoRepository.findByParticipanteId(id));
 
         return "perfil/perfil";

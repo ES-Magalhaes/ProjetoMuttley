@@ -1,6 +1,7 @@
 package com.muttley.organizador;
 
 import com.muttley.evento.EventoRepository;
+import com.muttley.medalha.Medalha;
 import com.muttley.medalha.MedalhaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/organizador")
@@ -73,15 +76,14 @@ public class OrganizadorController {
 		Organizador organizador = organizadorRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("Organizador não encontrado."));
 
-		// Apenas medalhas validadas
-		java.util.List<com.muttley.medalha.Medalha> medalhasValidadas = medalhaService.listarPorParticipante(id).stream()
-				.filter(com.muttley.medalha.Medalha::isValidada)
-				.toList();
+		// Busca todas as medalhas concedidas (elas já nascem validadas na nossa
+		// arquitetura)
+		List<Medalha> medalhas = medalhaService.listarPorParticipante(id);
 
 		model.addAttribute("organizador", organizador);
 		model.addAttribute("eventos", eventoRepository.findByOrganizadorId(id));
-		model.addAttribute("medalhas", medalhasValidadas);
-		model.addAttribute("totalMedalhas", medalhasValidadas.size());
+		model.addAttribute("medalhas", medalhas);
+		model.addAttribute("totalMedalhas", medalhas.size());
 		return "organizador/perfil";
 	}
 }

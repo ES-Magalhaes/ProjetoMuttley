@@ -1,6 +1,5 @@
 package com.muttley.medalha;
 
-import com.muttley.competencia.Competencia;
 import com.muttley.evento.Evento;
 import com.muttley.inscricao.Inscricao;
 import com.muttley.organizador.Organizador;
@@ -8,8 +7,6 @@ import com.muttley.pessoa.Pessoa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -18,173 +15,68 @@ public class MedalhaService {
     @Autowired
     private MedalhaRepository medalhaRepository;
 
-    private static final int EVENTOS_PARA_COMPETENCIA = 3;
-    private static final int CARGA_HORARIA_CONCLUSAO = 8;
+    public List<Medalha> listarPorParticipante(Long pessoaId) {
+        return medalhaRepository.findByParticipanteId(pessoaId);
+    }
 
-    // =========================================================================
-    // CONCESSÃO AUTOMÁTICA DE MEDALHAS (chamado no check-in)
-    // =========================================================================
+    @Transactional
+    public Medalha concederMedalhaManual(Medalha medalha) {
+        medalha.setTipo("MANUAL");
+        return medalhaRepository.save(medalha);
+    }
 
-    /**
-     * Processa todas as medalhas aplicáveis após um check-in confirmado.
-     * Regras:
-     * - Organizador/Palestrante do evento NÃO recebe medalha de participação/conclusão
-     * - Se carga horária >= 8h → CONCLUSAO (substitui PARTICIPACAO, não gera ambas)
-     * - Se carga horária < 8h → PARTICIPACAO
-     * - Organizador do evento recebe APRESENTACAO (Palestra/Seminário) ou ORGANIZACAO (demais)
-     * - Medalha de COMPETENCIA: após 3 eventos com a mesma competência
-     */
     @Transactional
     public void processarMedalhasCheckIn(Inscricao inscricao) {
         Pessoa participante = inscricao.getParticipante();
         Evento evento = inscricao.getEvento();
 
-        boolean ehOrganizadorDoEvento = isOrganizadorDoEvento(participante, evento);
+        // ---- REGRA 1: Medalha por Categoria (Ex: Concluiu 3 eventos da mesma
+        // categoria) ----
+        String categoria = evento.getCategoria();
+        long qtdPorCategoria = medalhaRepository.countEventosConcluidosPorCategoria(participante.getId(), categoria);
 
-        // 1. Medalha de Participação ou Conclusão (apenas para quem NÃO é organizador do evento)
-        if (!ehOrganizadorDoEvento) {
-            concederMedalhaParticipacaoOuConclusao(inscricao, participante, evento);
+        if (qtdPorCategoria >= 3) {
+            String nomeMedalhaCat = "Especialista em " + categoria;
+            if (!medalhaRepository.existsByParticipanteIdAndNome(participante.getId(), nomeMedalhaCat)) {
+                Medalha m = new Medalha();
+                m.setNome(nomeMedalhaCat);
+                m.setDescricao("Conquistada ao comparecer a 3 ou mais eventos da categoria " + categoria + ".");
+                m.setIcone("bi-award-fill");
+                m.setTipo("CATEGORIA");
+                m.setParticipante(participante);
+                medalhaRepository.save(m);
+            }
         }
 
-        // 2. Medalha de Organização/Apresentação para o organizador do evento
-        //    (concedida na primeira vez que alguém faz check-in, confirmando que o evento aconteceu)
-        concederMedalhaOrganizador(evento);
-
-        // 3. Medalhas de Competência (independente do tipo de medalha anterior)
-        verificarMedalhasCompetencia(participante, evento);
-    }
-
-    private boolean isOrganizadorDoEvento(Pessoa participante, Evento evento) {
-        if (evento.getOrganizador() == null) return false;
-        return evento.getOrganizador().getId().equals(participante.getId());
-    }
-
-    private void concederMedalhaParticipacaoOuConclusao(Inscricao inscricao, Pessoa participante, Evento evento) {
-        // Evita duplicata para esta inscrição
-        if (medalhaRepository.existsByInscricaoId(inscricao.getId())) {
-            return;
+        // ---- REGRA 2: Medalha por Carga Horária Cumulativa (Ex: Maratonista 20h) ----
+        int cargaTotal = medalhaRepository.sumCargaHorariaPorParticipante(participante.getId());
+        if (cargaTotal >= 20) {
+            String nomeMedalhaHoras = "Maratonista de Conhecimento (20h+)";
+            if (!medalhaRepository.existsByParticipanteIdAndNome(participante.getId(), nomeMedalhaHoras)) {
+                Medalha m = new Medalha();
+                m.setNome(nomeMedalhaHoras);
+                m.setDescricao("Conquistada ao acumular mais de 20 horas de carga horária em eventos confirmados.");
+                m.setIcone("bi-lightning-charge-fill");
+                m.setTipo("CARGA_HORARIA");
+                m.setParticipante(participante);
+                medalhaRepository.save(m);
+            }
         }
 
-        // Se carga horária >= 8h → CONCLUSAO, senão → PARTICIPACAO
-        Medalha.TipoMedalha tipo;
-        if (evento.getCargaHoraria() != null && evento.getCargaHoraria() >= CARGA_HORARIA_CONCLUSAO) {
-            tipo = Medalha.TipoMedalha.CONCLUSAO;
-        } else {
-            tipo = Medalha.TipoMedalha.PARTICIPACAO;
-        }
-
-        Medalha medalha = new Medalha();
-        medalha.setParticipante(participante);
-        medalha.setEvento(evento);
-        medalha.setTipo(tipo);
-        medalha.setDataConcessao(LocalDate.now());
-        medalha.setInscricaoId(inscricao.getId());
-        medalhaRepository.save(medalha);
-    }
-
-    private void concederMedalhaOrganizador(Evento evento) {
+        // ---- REGRA 3: Medalha para o Organizador do Evento ----
         Organizador organizador = evento.getOrganizador();
-        if (organizador == null) return;
-
-        // Determina o tipo: APRESENTACAO para Palestra/Seminário, ORGANIZACAO para o resto
-        String categoria = evento.getCategoria() != null ? evento.getCategoria().toLowerCase() : "";
-        Medalha.TipoMedalha tipo;
-        if (categoria.contains("palestra") || categoria.contains("seminário") || categoria.contains("seminario")) {
-            tipo = Medalha.TipoMedalha.APRESENTACAO;
-        } else {
-            tipo = Medalha.TipoMedalha.ORGANIZACAO;
-        }
-
-        // Evita duplicata: verifica se já existe medalha desse tipo para este organizador neste evento
-        if (medalhaRepository.existsByParticipanteIdAndEventoIdAndTipo(
-                organizador.getId(), evento.getId(), tipo)) {
-            return;
-        }
-
-        Medalha medalha = new Medalha();
-        medalha.setParticipante(organizador);
-        medalha.setEvento(evento);
-        medalha.setTipo(tipo);
-        medalha.setDataConcessao(LocalDate.now());
-        // Não usa inscricaoId pois o organizador não tem inscrição
-        medalhaRepository.save(medalha);
-    }
-
-    private void verificarMedalhasCompetencia(Pessoa participante, Evento evento) {
-        List<Competencia> competencias = evento.getCompetencias();
-        if (competencias == null || competencias.isEmpty()) return;
-
-        for (Competencia competencia : competencias) {
-            // Já tem medalha de competência para esta competência?
-            if (medalhaRepository.existsMedalhaCompetencia(participante.getId(), competencia.getNome())) {
-                continue;
-            }
-
-            // Conta quantos eventos com esta competência o participante já completou
-            long count = medalhaRepository.contarEventosComCompetencia(
-                    participante.getId(), competencia.getId());
-
-            if (count >= EVENTOS_PARA_COMPETENCIA) {
-                Medalha medalha = new Medalha();
-                medalha.setParticipante(participante);
-                medalha.setEvento(evento); // Evento que disparou a conquista
-                medalha.setTipo(Medalha.TipoMedalha.COMPETENCIA);
-                medalha.setCompetenciaNome(competencia.getNome());
-                medalha.setDataConcessao(LocalDate.now());
-                medalhaRepository.save(medalha);
+        if (organizador != null) {
+            String nomeMedalhaOrg = "Mentor de Comunidade";
+            if (!medalhaRepository.existsByParticipanteIdAndNome(organizador.getId(), nomeMedalhaOrg)) {
+                Medalha m = new Medalha();
+                m.setNome(nomeMedalhaOrg);
+                m.setDescricao(
+                        "Conquistada por mestres e palestrantes que organizaram ou ministraram um evento institucional.");
+                m.setIcone("bi-star-fill");
+                m.setTipo("ORGANIZADOR");
+                m.setParticipante(organizador); // Polimorfismo aceita o Organizador aqui perfeitamente
+                medalhaRepository.save(m);
             }
         }
-    }
-
-    // =========================================================================
-    // CONSULTAS
-    // =========================================================================
-
-    public List<Medalha> listarPorParticipante(Long pessoaId) {
-        return medalhaRepository.findByParticipanteId(pessoaId);
-    }
-
-    public List<Medalha> listarTodasOrdenadas() {
-        return medalhaRepository.findAllByOrderByValidadaAscDataConcessaoDesc();
-    }
-
-    public List<Medalha> listarPendentes() {
-        return medalhaRepository.findByValidada(false);
-    }
-
-    public int totalHorasPorParticipante(Long pessoaId) {
-        Integer total = medalhaRepository.somarHorasPorParticipante(pessoaId);
-        return total != null ? total : 0;
-    }
-
-    public long totalMedalhasPorParticipante(Long pessoaId) {
-        return medalhaRepository.countByParticipanteId(pessoaId);
-    }
-
-    // =========================================================================
-    // VALIDAÇÃO MANUAL (tela /medalha)
-    // =========================================================================
-
-    @Transactional
-    public void validar(Long medalhaId, String observacao) {
-        Medalha medalha = medalhaRepository.findById(medalhaId)
-                .orElseThrow(() -> new RuntimeException("Medalha não encontrada."));
-        medalha.setValidada(true);
-        medalha.setObservacaoValidacao(observacao);
-        medalhaRepository.save(medalha);
-    }
-
-    @Transactional
-    public void revogar(Long medalhaId, String observacao) {
-        Medalha medalha = medalhaRepository.findById(medalhaId)
-                .orElseThrow(() -> new RuntimeException("Medalha não encontrada."));
-        medalha.setValidada(false);
-        medalha.setObservacaoValidacao(observacao);
-        medalhaRepository.save(medalha);
-    }
-
-    @Transactional
-    public void excluir(Long medalhaId) {
-        medalhaRepository.deleteById(medalhaId);
     }
 }
