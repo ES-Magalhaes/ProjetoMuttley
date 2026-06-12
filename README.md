@@ -1,8 +1,8 @@
-#Projeto Muttley
+# Projeto Muttley
 
-##Projeto para administração de eventos internos da FATEC ZL
+## Projeto para administração de eventos internos da FATEC ZL
 
-###Autores
+### Autores
 - **Cauã Henrique**
 - **Enzo Magalhães**
 - **Gustavo da Silva**
