@@ -22,14 +22,7 @@ public class PessoaController {
         return "pessoa/listagem";
     }
 
-    // 2. Abertura do formulário (vazio para novo registro)
-    @GetMapping("/formulario")
-    public String formulario(Model model) {
-        model.addAttribute("pessoa", new DadosPessoa(null, "", "", "", "", ""));
-        return "pessoa/formulario";
-    }
-
-    // 3. Edição (carrega dados de uma pessoa existente)
+    // 2. Edição (carrega dados de uma pessoa existente)
     @GetMapping("/formulario/{id}")
     public String editar(@PathVariable Long id, Model model) {
         model.addAttribute("pessoa", pessoaService.buscarParaEdicao(id));

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +22,7 @@ public class MedalhaController {
     @Autowired
     private PessoaRepository pessoaRepository;
 
-    // 1. LISTAGEM: Exibe todas as medalhas para gerenciamento
+    // LISTAGEM: Exibe todas as medalhas concedidas para gerenciamento/moderação
     @GetMapping
     public String listarTodas(Model model) {
         model.addAttribute("medalhas", medalhaRepository.findAll());
@@ -39,24 +38,8 @@ public class MedalhaController {
         return "medalha/listagem";
     }
 
-    @GetMapping("/novo")
-    public String exibirFormulario(Model model) {
-        Medalha medalha = new Medalha();
-        medalha.setTipo("HONRA_MANUAL");
-        model.addAttribute("medalha", medalha);
-        return "medalha/formulario";
-    }
-
-    @PostMapping("/salvar")
-    public String salvarMedalhaManual(@ModelAttribute("medalha") Medalha medalha) {
-        medalha.setDataConquista(LocalDateTime.now());
-        medalha.setStatus("PENDENTE"); // Toda medalha nova nasce aguardando aprovação
-        medalhaService.concederMedalhaManual(medalha);
-        return "redirect:/medalha";
-    }
-
     // ==========================================
-    //  NOVAS ROTAS: MODERAÇÃO INDIVIDUAL
+    //  MODERAÇÃO INDIVIDUAL
     // ==========================================
 
     @PostMapping("/aprovar/{id}")
@@ -78,18 +61,17 @@ public class MedalhaController {
     }
 
     // ==========================================
-    //  NOVA ROTA: PROCESSAMENTO EM LOTE (BULK)
+    //  PROCESSAMENTO EM LOTE (BULK)
     // ==========================================
-    
+
     @PostMapping("/em-lote")
     public String processarEmLote(
             @RequestParam(value = "ids", required = false) List<Long> ids,
             @RequestParam("acao") String acao) {
-        
-        // Se o usuário não selecionou nenhuma checkbox, apenas ignora e recarrega
+
         if (ids != null && !ids.isEmpty()) {
             List<Medalha> medalhas = medalhaRepository.findAllById(ids);
-            
+
             for (Medalha medalha : medalhas) {
                 if ("aprovar".equalsIgnoreCase(acao)) {
                     medalha.setStatus("APROVADA");
@@ -97,10 +79,9 @@ public class MedalhaController {
                     medalha.setStatus("REPROVADA");
                 }
             }
-            // Salva todas as alterações de uma vez só
             medalhaRepository.saveAll(medalhas);
         }
-        
+
         return "redirect:/medalha";
     }
 }

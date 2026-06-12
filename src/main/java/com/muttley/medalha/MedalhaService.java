@@ -1,6 +1,7 @@
 package com.muttley.medalha;
 
 import com.muttley.evento.Evento;
+import com.muttley.evento.EventoRepository;
 import com.muttley.inscricao.Inscricao;
 import com.muttley.inscricao.InscricaoRepository;
 import com.muttley.organizador.Organizador;
@@ -24,20 +25,18 @@ public class MedalhaService {
     @Autowired
     private InscricaoRepository inscricaoRepository;
 
+    @Autowired
+    private EventoRepository eventoRepository;
+
     public List<Medalha> listarPorParticipante(Long pessoaId) {
         return medalhaRepository.findByParticipanteId(pessoaId);
-    }
-
-    @Transactional
-    public Medalha concederMedalhaManual(Medalha medalha) {
-        medalha.setTipo("MANUAL");
-        return medalhaRepository.save(medalha);
     }
 
     /**
      * Processa todas as regras de medalha ativas quando um check-in é realizado.
      * Avalia dinamicamente cada regra cadastrada no banco e concede a medalha
      * caso o participante atinja o critério e ainda não possua aquela medalha.
+     * Também avalia regras de organizador para o responsável do evento.
      */
     @Transactional
     public void processarMedalhasCheckIn(Inscricao inscricao) {
@@ -48,6 +47,12 @@ public class MedalhaService {
         List<RegraMedalha> regras = regraMedalhaRepository.findByAtivoTrue();
 
         for (RegraMedalha regra : regras) {
+            if (regra.getTipoCriterio() == TipoCriterio.ORGANIZADOR) {
+                // Regras de organizador são avaliadas para o organizador do evento, não o participante
+                processarRegraOrganizador(regra, evento);
+                continue;
+            }
+
             // Verifica se o participante já possui essa medalha
             if (medalhaRepository.existsByParticipanteIdAndNome(participante.getId(), regra.getNomeMedalha())) {
                 continue;
@@ -59,9 +64,34 @@ public class MedalhaService {
                 concederMedalhaAutomatica(participante, regra);
             }
         }
+    }
 
-        // Regra especial: Medalha para o Organizador do Evento (mantida como lógica fixa)
-        processarMedalhaOrganizador(evento);
+    /**
+     * Avalia regras do tipo ORGANIZADOR para o organizador do evento.
+     * Ex: "Organizou pelo menos 1 evento" → ganha medalha "Mentor de Comunidade"
+     */
+    private void processarRegraOrganizador(RegraMedalha regra, Evento evento) {
+        Organizador organizador = evento.getOrganizador();
+        if (organizador == null) return;
+
+        // Verifica se já possui essa medalha
+        if (medalhaRepository.existsByParticipanteIdAndNome(organizador.getId(), regra.getNomeMedalha())) {
+            return;
+        }
+
+        // Conta quantos eventos esse organizador tem
+        long qtdEventos = eventoRepository.countByOrganizadorId(organizador.getId());
+        if (qtdEventos >= regra.getQuantidadeMinima()) {
+            Medalha medalha = new Medalha();
+            medalha.setNome(regra.getNomeMedalha());
+            medalha.setDescricao(regra.getDescricaoMedalha());
+            medalha.setIcone(regra.getIcone());
+            medalha.setTipo("ORGANIZADOR");
+            medalha.setParticipante(organizador);
+            medalha.setDataConquista(LocalDateTime.now());
+            medalha.setStatus("APROVADA");
+            medalhaRepository.save(medalha);
+        }
     }
 
     /**
@@ -84,12 +114,11 @@ public class MedalhaService {
                 yield cargaTotal >= regra.getQuantidadeMinima();
             }
             case EVENTO_ESPECIFICO -> {
-                // Concede medalha se o participante fez check-in neste evento específico
                 if (regra.getEvento() == null) yield false;
                 yield eventoAtual.getId().equals(regra.getEvento().getId());
             }
             case ORGANIZADOR -> {
-                // Regras do tipo ORGANIZADOR são avaliadas separadamente
+                // Tratado em processarRegraOrganizador
                 yield false;
             }
         };
@@ -106,28 +135,7 @@ public class MedalhaService {
         medalha.setTipo(regra.getTipoCriterio().name());
         medalha.setParticipante(participante);
         medalha.setDataConquista(LocalDateTime.now());
-        medalha.setStatus("APROVADA"); // Medalhas automáticas já nascem aprovadas
+        medalha.setStatus("APROVADA");
         medalhaRepository.save(medalha);
-    }
-
-    /**
-     * Regra fixa: Concede medalha ao organizador do evento quando há check-in.
-     */
-    private void processarMedalhaOrganizador(Evento evento) {
-        Organizador organizador = evento.getOrganizador();
-        if (organizador != null) {
-            String nomeMedalhaOrg = "Mentor de Comunidade";
-            if (!medalhaRepository.existsByParticipanteIdAndNome(organizador.getId(), nomeMedalhaOrg)) {
-                Medalha m = new Medalha();
-                m.setNome(nomeMedalhaOrg);
-                m.setDescricao("Conquistada por mestres e palestrantes que organizaram ou ministraram um evento institucional.");
-                m.setIcone("bi-star-fill");
-                m.setTipo("ORGANIZADOR");
-                m.setParticipante(organizador);
-                m.setDataConquista(LocalDateTime.now());
-                m.setStatus("APROVADA");
-                medalhaRepository.save(m);
-            }
-        }
     }
 }

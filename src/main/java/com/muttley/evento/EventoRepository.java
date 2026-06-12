@@ -10,4 +10,5 @@ import java.util.List;
 public interface EventoRepository extends JpaRepository<Evento, Long> {
     List<Evento> findByOrganizadorId(Long organizadorId);
     List<Evento> findByCompetenciasContaining(Competencia competencia);
+    long countByOrganizadorId(Long organizadorId);
 }
