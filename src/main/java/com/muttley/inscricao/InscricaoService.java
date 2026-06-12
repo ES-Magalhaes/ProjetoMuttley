@@ -78,6 +78,12 @@ public class InscricaoService {
         certificado.setCargaHoraria(
                 evento.getCargaHoraria() != null ? evento.getCargaHoraria() + "h" : "");
 
+        // Preenche dados do assinante a partir do evento
+        if (evento.getAssinante() != null) {
+            certificado.setNomeAssinante(evento.getAssinante().getNome());
+            certificado.setCargoAssinante(evento.getAssinante().getCargo());
+        }
+
         return certificadoRepository.save(certificado);
     }
 

@@ -36,6 +36,9 @@ public record DadosEvento(
 
 		@NotNull(message = "Selecione um organizador") Long organizadorId,
 
+		// ID do assinante do certificado (opcional)
+		Long assinanteId,
+
 		// IDs das competências associadas ao evento (opcional)
 		List<Long> competenciaIds) {
 }

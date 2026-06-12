@@ -133,7 +133,8 @@
 
     <div class="signature-area">
       <div class="sig-line"></div>
-      <p class="sig-label">Coordenador do curso de Análise e Desenvolvimento de<br/>Sistemas da FATEC Zona Leste</p>
+      <p class="sig-label" th:if="${certificado.nomeAssinante != null}" th:text="${certificado.nomeAssinante + ' - ' + certificado.cargoAssinante}">Nome - Cargo</p>
+      <p class="sig-label" th:unless="${certificado.nomeAssinante != null}">Coordenador do curso de Análise e Desenvolvimento de<br/>Sistemas da FATEC Zona Leste</p>
     </div>
 
     <table class="logos">

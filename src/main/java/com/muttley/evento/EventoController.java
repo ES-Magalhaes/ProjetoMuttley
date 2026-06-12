@@ -4,6 +4,7 @@ import com.muttley.pessoa.DadosPessoa;
 import com.muttley.pessoa.PessoaService;
 import com.muttley.inscricao.InscricaoService;
 import com.muttley.competencia.CompetenciaRepository;
+import com.muttley.assinante.AssinanteRepository;
 import com.muttley.organizador.OrganizadorService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class EventoController {
 	@Autowired
 	private CompetenciaRepository competenciaRepository;
 
+	@Autowired
+	private AssinanteRepository assinanteRepository;
+
 	// =========================================================================
 	// ROTAS DO CRUD DE EVENTOS (Adicionadas para corrigir o Erro 404)
 	// =========================================================================
@@ -44,9 +48,10 @@ public class EventoController {
 
 	@GetMapping("/formulario")
 	public String exibirFormularioNovo(Model model) {
-		model.addAttribute("evento", new DadosEvento(null, "", "", "", "", "", null, null, null, null, null, null, null));
+		model.addAttribute("evento", new DadosEvento(null, "", "", "", "", "", null, null, null, null, null, null, null, null));
 		model.addAttribute("organizadores", organizadorService.listarTodos());
 		model.addAttribute("todasCompetencias", competenciaRepository.findAll());
+		model.addAttribute("assinantes", assinanteRepository.findByAtivoTrue());
 		return "evento/formulario";
 	}
 
@@ -57,6 +62,7 @@ public class EventoController {
 			model.addAttribute("evento", dto);
 			model.addAttribute("organizadores", organizadorService.listarTodos());
 			model.addAttribute("todasCompetencias", competenciaRepository.findAll());
+			model.addAttribute("assinantes", assinanteRepository.findByAtivoTrue());
 			// IDs das competências já associadas ao evento
 			model.addAttribute("competenciasSelecionadas",
 				eventoService.buscarPorId(id).getCompetencias().stream()

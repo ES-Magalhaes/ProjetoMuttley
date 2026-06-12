@@ -28,6 +28,10 @@ public class Certificado {
     @Column(unique = true)
     Long inscricaoId;
 
+    // Dados do assinante do certificado
+    String nomeAssinante;
+    String cargoAssinante;
+
     public Certificado(){
 
     }
@@ -94,5 +98,21 @@ public class Certificado {
 
     public void setInscricaoId(Long inscricaoId) {
         this.inscricaoId = inscricaoId;
+    }
+
+    public String getNomeAssinante() {
+        return nomeAssinante;
+    }
+
+    public void setNomeAssinante(String nomeAssinante) {
+        this.nomeAssinante = nomeAssinante;
+    }
+
+    public String getCargoAssinante() {
+        return cargoAssinante;
+    }
+
+    public void setCargoAssinante(String cargoAssinante) {
+        this.cargoAssinante = cargoAssinante;
     }
 }

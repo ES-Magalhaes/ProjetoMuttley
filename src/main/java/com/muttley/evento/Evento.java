@@ -69,6 +69,11 @@ public class Evento {
 	@JoinColumn(name = "organizador_id")
 	private Organizador organizador;
 
+	// Assinante do certificado deste evento
+	@ManyToOne
+	@JoinColumn(name = "assinante_id")
+	private com.muttley.assinante.Assinante assinante;
+
 	// Relacionamento correto com a entidade intermediária Inscricao
 	@OneToMany(mappedBy = "evento")
 	private List<Inscricao> inscricoes;
