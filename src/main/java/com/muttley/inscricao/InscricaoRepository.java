@@ -22,4 +22,7 @@ public interface InscricaoRepository extends JpaRepository<Inscricao, Long> {
 
     // Busca todas as inscrições de um participante (histórico)
     List<Inscricao> findByParticipanteId(Long participanteId);
+
+    // Conta participações com presença confirmada (para regras de medalha)
+    long countByParticipanteIdAndPresencaConfirmadaTrue(Long participanteId);
 }

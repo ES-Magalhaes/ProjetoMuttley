@@ -108,9 +108,10 @@
                 <div class="form-group mb-3">
                   <label class="form-label font-weight-bold">Carga Horária (Horas)</label>
                   <input type="number" th:field="*{cargaHoraria}" class="form-control" min="1"
-                         th:classappend="${#fields.hasErrors('cargaHoraria')} ? 'is-invalid'"
-                         placeholder="Ex: 4" />
-                  <div class="invalid-feedback" th:errors="*{cargaHoraria}"></div>
+                         id="cargaHoraria" readonly
+                         style="background-color: #f1f3f5; cursor: not-allowed;"
+                         placeholder="Calculado automaticamente" />
+                  <small class="text-muted">Calculado automaticamente com base no horário de início e fim</small>
                 </div>
               </div>
               <div class="col-md-6">
@@ -165,6 +166,35 @@
               <!-- Inputs hidden -->
               <div id="hiddenInputsCompetencias"></div>
             </div>
+
+            <!-- Script de cálculo automático da carga horária -->
+            <script>
+              document.addEventListener('DOMContentLoaded', function() {
+                var horaInicio = document.getElementById('horaInicio');
+                var horaFim = document.getElementById('horaFim');
+                var cargaHoraria = document.getElementById('cargaHoraria');
+
+                function calcularCargaHoraria() {
+                  if (horaInicio.value && horaFim.value) {
+                    var inicio = horaInicio.value.split(':');
+                    var fim = horaFim.value.split(':');
+                    var minutosInicio = parseInt(inicio[0]) * 60 + parseInt(inicio[1]);
+                    var minutosFim = parseInt(fim[0]) * 60 + parseInt(fim[1]);
+                    var diferenca = minutosFim - minutosInicio;
+                    if (diferenca > 0) {
+                      cargaHoraria.value = Math.ceil(diferenca / 60);
+                    } else {
+                      cargaHoraria.value = '';
+                    }
+                  }
+                }
+
+                horaInicio.addEventListener('change', calcularCargaHoraria);
+                horaFim.addEventListener('change', calcularCargaHoraria);
+                // Calcula ao carregar (para edição)
+                calcularCargaHoraria();
+              });
+            </script>
 
             <!-- Script de competências -->
             <script th:inline="javascript">

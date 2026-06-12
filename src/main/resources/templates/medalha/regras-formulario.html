@@ -1,0 +1,158 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+  <head th:replace="~{fragmentos/head :: head('Muttley System - Cadastrar Regra de Medalha')}"></head>
+  <body>
+    <header th:replace="~{fragmentos/header :: header}" th:with="activePage='Medalha'"></header>
+
+    <main class="container" style="margin-top: 30px; margin-bottom: 50px; font-family: 'Quicksand', sans-serif; display: flex; justify-content: center;">
+      <div class="card" style="background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 30px; width: 100%; max-width: 700px;">
+
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 25px;">
+          <h2 style="margin: 0; color: #333; display: flex; align-items: center; gap: 10px; font-size: 22px;">
+            <i class="fa-solid fa-gears" style="color: #4a90e2"></i>
+            <span th:text="${regra.id != null ? 'Editar Regra de Medalha' : 'Nova Regra de Medalha'}">Cadastrar Regra</span>
+          </h2>
+          <a th:href="@{/medalha/regras}" style="color: #666; text-decoration: none; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 5px;">
+            <i class="fa-solid fa-arrow-left"></i> Voltar
+          </a>
+        </div>
+
+        <form th:action="@{/medalha/regras/salvar}" th:object="${regra}" method="post" style="display: flex; flex-direction: column; gap: 20px;">
+
+          <!-- ID oculto para edição -->
+          <input type="hidden" th:field="*{id}" />
+
+          <div>
+            <label for="nomeMedalha" style="display: block; font-weight: bold; margin-bottom: 8px; color: #555;">Nome da Medalha Concedida</label>
+            <input type="text" id="nomeMedalha" th:field="*{nomeMedalha}" placeholder="Ex: Especialista em Workshops, Maratonista 50h" required
+              style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit;" />
+          </div>
+
+          <div>
+            <label for="descricaoMedalha" style="display: block; font-weight: bold; margin-bottom: 8px; color: #555;">Descrição da Medalha</label>
+            <textarea id="descricaoMedalha" th:field="*{descricaoMedalha}" rows="3" placeholder="Descreva o que o participante precisa fazer para conquistar esta medalha..." required
+              style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; resize: vertical;"></textarea>
+          </div>
+
+          <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 250px;">
+              <label for="icone" style="display: block; font-weight: bold; margin-bottom: 8px; color: #555;">Ícone da Medalha</label>
+              <select id="icone" th:field="*{icone}" required
+                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; background-color: white;">
+                <option value="fa-solid fa-trophy">🏆 Troféu</option>
+                <option value="fa-solid fa-star">⭐ Estrela</option>
+                <option value="fa-solid fa-award">🎖️ Medalha</option>
+                <option value="fa-solid fa-gem">💎 Diamante</option>
+                <option value="fa-solid fa-graduation-cap">🎓 Formatura</option>
+                <option value="fa-solid fa-bolt">⚡ Raio</option>
+                <option value="fa-solid fa-fire">🔥 Fogo</option>
+                <option value="fa-solid fa-circle-check">✅ Check</option>
+              </select>
+            </div>
+
+            <div style="flex: 1; min-width: 250px;">
+              <label for="tipoCriterio" style="display: block; font-weight: bold; margin-bottom: 8px; color: #555;">Tipo de Critério</label>
+              <select id="tipoCriterio" th:field="*{tipoCriterio}" required onchange="toggleCamposCondicionais()"
+                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; background-color: white;">
+                <option value="">-- Selecione --</option>
+                <option value="PARTICIPACOES_CATEGORIA">Participações por Categoria</option>
+                <option value="PARTICIPACOES_TOTAL">Participações Totais</option>
+                <option value="CARGA_HORARIA">Carga Horária Acumulada</option>
+                <option value="EVENTO_ESPECIFICO">Evento Específico</option>
+                <option value="ORGANIZADOR">Organizador de Eventos</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <!-- Campo Categoria do Evento (mesmo lookup do cadastro de evento) -->
+            <div id="categoriaField" style="flex: 1; min-width: 250px;">
+              <label for="categoriaEvento" style="display: block; font-weight: bold; margin-bottom: 8px; color: #555;">Categoria do Evento</label>
+              <select id="categoriaEvento" th:field="*{categoriaEvento}"
+                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; background-color: white;">
+                <option value="">Selecione uma categoria...</option>
+                <option value="Palestra">Palestra</option>
+                <option value="Workshop">Workshop</option>
+                <option value="Curso">Curso</option>
+                <option value="Seminário">Seminário</option>
+                <option value="Congresso">Congresso</option>
+                <option value="Semana Acadêmica">Semana Acadêmica</option>
+                <option value="Treinamento">Treinamento</option>
+                <option value="Extensão">Extensão</option>
+                <option value="Hackathon">Hackathon</option>
+                <option value="Projeto">Projeto</option>
+                <option value="Monitoria">Monitoria</option>
+                <option value="Organização de Evento">Organização de Evento</option>
+              </select>
+              <small style="color: #888; font-size: 12px;">Obrigatório para o critério "Participações por Categoria"</small>
+            </div>
+
+            <div style="flex: 1; min-width: 250px;">
+              <label for="quantidadeMinima" style="display: block; font-weight: bold; margin-bottom: 8px; color: #555;">Quantidade Mínima</label>
+              <input type="number" id="quantidadeMinima" th:field="*{quantidadeMinima}" min="1" placeholder="Ex: 3, 5, 20" required
+                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit;" />
+              <small style="color: #888; font-size: 12px;">Participações ou horas necessárias (use 1 para Evento Específico)</small>
+            </div>
+          </div>
+
+          <!-- Campo Evento Específico -->
+          <div id="eventoField" style="display: none;">
+            <label for="eventoId" style="display: block; font-weight: bold; margin-bottom: 8px; color: #555;">Evento Específico</label>
+            <select id="eventoId" name="eventoId"
+              style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; background-color: white;">
+              <option value="">Selecione o evento...</option>
+              <option th:each="ev : ${eventos}" th:value="${ev.id}" th:text="${ev.nome}"
+                      th:selected="${regra.evento != null and regra.evento.id == ev.id}">Evento</option>
+            </select>
+            <small style="color: #888; font-size: 12px;">A medalha será concedida ao participar deste evento</small>
+          </div>
+
+          <div>
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+              <input type="checkbox" th:field="*{ativo}" style="transform: scale(1.3);" />
+              <span style="font-weight: bold; color: #555;">Regra ativa (será avaliada automaticamente no check-in)</span>
+            </label>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 15px; border-top: 1px solid #f0f0f0; padding-top: 20px;">
+            <a th:href="@{/medalha/regras}" class="btn" style="background-color: #e9ecef; color: #495057; border: 1px solid #ced4da; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: bold; font-family: inherit;">
+              Cancelar
+            </a>
+            <button type="submit" class="btn" style="background-color: #4a90e2; color: white; border: none; padding: 10px 24px; border-radius: 4px; cursor: pointer; font-weight: bold; font-family: inherit;">
+              <i class="fa-solid fa-floppy-disk" style="margin-right: 5px"></i> Salvar Regra
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <footer th:replace="~{fragmentos/footer :: footer}"></footer>
+
+    <script>
+      function toggleCamposCondicionais() {
+        var tipo = document.getElementById('tipoCriterio').value;
+        var categoriaField = document.getElementById('categoriaField');
+        var eventoField = document.getElementById('eventoField');
+
+        // Categoria: visível apenas para PARTICIPACOES_CATEGORIA
+        if (tipo === 'PARTICIPACOES_CATEGORIA') {
+          categoriaField.style.opacity = '1';
+          categoriaField.style.pointerEvents = 'auto';
+        } else {
+          categoriaField.style.opacity = '0.4';
+          categoriaField.style.pointerEvents = 'none';
+        }
+
+        // Evento: visível apenas para EVENTO_ESPECIFICO
+        if (tipo === 'EVENTO_ESPECIFICO') {
+          eventoField.style.display = 'block';
+        } else {
+          eventoField.style.display = 'none';
+        }
+      }
+
+      // Executa ao carregar a página (para edição)
+      document.addEventListener('DOMContentLoaded', toggleCamposCondicionais);
+    </script>
+  </body>
+</html>

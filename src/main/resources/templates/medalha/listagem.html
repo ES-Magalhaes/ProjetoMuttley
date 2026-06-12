@@ -48,22 +48,39 @@
             <i class="fa-solid fa-list-check" style="color: #4a90e2"></i>
             <span th:text="${participante.nome}">Painel de Moderação</span>
           </h2>
-          <a
-            th:href="@{/medalha/novo}"
-            class="btn"
-            style="
-              background-color: #4a90e2;
-              color: white;
-              text-decoration: none;
-              padding: 8px 16px;
-              border-radius: 5px;
-              font-weight: bold;
-              font-size: 14px;
-            "
-          >
-            <i class="fa-solid fa-plus" style="margin-right: 5px"></i> Novo Tipo
-            de Medalha
-          </a>
+          <div style="display: flex; gap: 10px;">
+            <a
+              th:href="@{/medalha/regras}"
+              class="btn"
+              style="
+                background-color: #6c757d;
+                color: white;
+                text-decoration: none;
+                padding: 8px 16px;
+                border-radius: 5px;
+                font-weight: bold;
+                font-size: 14px;
+              "
+            >
+              <i class="fa-solid fa-gears" style="margin-right: 5px"></i> Regras
+            </a>
+            <a
+              th:href="@{/medalha/novo}"
+              class="btn"
+              style="
+                background-color: #4a90e2;
+                color: white;
+                text-decoration: none;
+                padding: 8px 16px;
+                border-radius: 5px;
+                font-weight: bold;
+                font-size: 14px;
+              "
+            >
+              <i class="fa-solid fa-plus" style="margin-right: 5px"></i> Novo Tipo
+              de Medalha
+            </a>
+          </div>
         </div>
 
         <form th:action="@{/medalha/em-lote}" method="post" id="formLote">

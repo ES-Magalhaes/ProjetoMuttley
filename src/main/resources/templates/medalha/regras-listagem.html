@@ -1,0 +1,102 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+  <head th:replace="~{fragmentos/head :: head('Muttley System - Regras de Medalha')}"></head>
+  <body>
+    <header th:replace="~{fragmentos/header :: header}" th:with="activePage='Medalha'"></header>
+
+    <main class="container" style="margin-top: 30px; margin-bottom: 50px; font-family: 'Quicksand', sans-serif;">
+      <div class="card" style="background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 20px;">
+
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px;">
+          <h2 style="margin: 0; color: #333; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-gears" style="color: #4a90e2"></i>
+            Regras de Concessão de Medalhas
+          </h2>
+          <div style="display: flex; gap: 10px;">
+            <a th:href="@{/medalha}" class="btn" style="background-color: #6c757d; color: white; text-decoration: none; padding: 8px 16px; border-radius: 5px; font-weight: bold; font-size: 14px;">
+              <i class="fa-solid fa-arrow-left" style="margin-right: 5px"></i> Voltar
+            </a>
+            <a th:href="@{/medalha/regras/nova}" class="btn" style="background-color: #4a90e2; color: white; text-decoration: none; padding: 8px 16px; border-radius: 5px; font-weight: bold; font-size: 14px;">
+              <i class="fa-solid fa-plus" style="margin-right: 5px"></i> Nova Regra
+            </a>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+              <tr style="background-color: #f1f3f5; color: #555; border-bottom: 2px solid #dee2e6;">
+                <th style="padding: 12px;">Medalha</th>
+                <th style="padding: 12px;">Critério</th>
+                <th style="padding: 12px;">Categoria / Evento</th>
+                <th style="padding: 12px;">Qtd. Mínima</th>
+                <th style="padding: 12px;">Status</th>
+                <th style="padding: 12px; text-align: center;">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="regra : ${regras}" style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px; font-weight: bold; color: #222;">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="background-color: #343a40; color: white; width: 35px; height: 35px; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                      <i th:class="${regra.icone}"></i>
+                    </div>
+                    <span th:text="${regra.nomeMedalha}">Nome</span>
+                  </div>
+                </td>
+                <td style="padding: 12px;">
+                  <span th:if="${regra.tipoCriterio.name() == 'PARTICIPACOES_CATEGORIA'}" style="background-color: #d0ebff; color: #1864ab; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">Participações por Categoria</span>
+                  <span th:if="${regra.tipoCriterio.name() == 'PARTICIPACOES_TOTAL'}" style="background-color: #fff3bf; color: #e67700; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">Participações Totais</span>
+                  <span th:if="${regra.tipoCriterio.name() == 'CARGA_HORARIA'}" style="background-color: #e8d5ff; color: #7048e8; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">Carga Horária</span>
+                  <span th:if="${regra.tipoCriterio.name() == 'ORGANIZADOR'}" style="background-color: #ffe8cc; color: #d9480f; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">Organizador</span>
+                  <span th:if="${regra.tipoCriterio.name() == 'EVENTO_ESPECIFICO'}" style="background-color: #c3fae8; color: #087f5b; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">Evento Específico</span>
+                </td>
+                <td style="padding: 12px; color: #666;">
+                  <span th:if="${regra.tipoCriterio.name() == 'PARTICIPACOES_CATEGORIA'}" th:text="${regra.categoriaEvento}"></span>
+                  <span th:if="${regra.tipoCriterio.name() == 'EVENTO_ESPECIFICO' and regra.evento != null}" th:text="${regra.evento.nome}"></span>
+                  <span th:if="${regra.tipoCriterio.name() != 'PARTICIPACOES_CATEGORIA' and regra.tipoCriterio.name() != 'EVENTO_ESPECIFICO'}">—</span>
+                </td>
+                <td style="padding: 12px; font-weight: bold; color: #333;" th:text="${regra.quantidadeMinima}">0</td>
+                <td style="padding: 12px;">
+                  <span th:if="${regra.ativo}" style="background-color: #d3f9d8; color: #2b8a3e; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">Ativa</span>
+                  <span th:unless="${regra.ativo}" style="background-color: #e9ecef; color: #868e96; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">Inativa</span>
+                </td>
+                <td style="padding: 12px; text-align: center;">
+                  <div style="display: inline-flex; gap: 8px;">
+                    <a th:href="@{/medalha/regras/editar/{id}(id=${regra.id})}" title="Editar" style="background-color: transparent; border: 1px solid #4a90e2; color: #4a90e2; padding: 4px 8px; border-radius: 4px; text-decoration: none;">
+                      <i class="fa-solid fa-pen"></i>
+                    </a>
+                    <form th:if="${regra.ativo}" th:action="@{/medalha/regras/desativar/{id}(id=${regra.id})}" method="post" style="margin: 0;">
+                      <button type="submit" title="Desativar" style="background-color: transparent; border: 1px solid #e67700; color: #e67700; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                        <i class="fa-solid fa-pause"></i>
+                      </button>
+                    </form>
+                    <form th:unless="${regra.ativo}" th:action="@{/medalha/regras/ativar/{id}(id=${regra.id})}" method="post" style="margin: 0;">
+                      <button type="submit" title="Ativar" style="background-color: transparent; border: 1px solid #2b8a3e; color: #2b8a3e; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                        <i class="fa-solid fa-play"></i>
+                      </button>
+                    </form>
+                    <form th:action="@{/medalha/regras/excluir/{id}(id=${regra.id})}" method="post" style="margin: 0;" onsubmit="return confirm('Tem certeza que deseja excluir esta regra?');">
+                      <button type="submit" title="Excluir" style="background-color: transparent; border: 1px solid #c2255c; color: #c2255c; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+
+              <tr th:if="${#lists.isEmpty(regras)}">
+                <td colspan="6" style="padding: 40px; text-align: center; color: #999;">
+                  <i class="fa-solid fa-inbox" style="font-size: 36px; margin-bottom: 10px; display: block;"></i>
+                  Nenhuma regra de medalha cadastrada. Clique em "Nova Regra" para começar.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <footer th:replace="~{fragmentos/footer :: footer}"></footer>
+  </body>
+</html>

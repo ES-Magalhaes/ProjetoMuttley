@@ -2,6 +2,7 @@ package com.muttley.evento;
 
 import com.muttley.competencia.Competencia;
 import com.muttley.competencia.CompetenciaRepository;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +38,13 @@ public class EventoService {
 			throw new IllegalArgumentException("A hora de término não pode ser anterior à hora de início.");
 		}
 
+		// Calcula a carga horária automaticamente a partir do intervalo de horários
+		long minutos = Duration.between(dto.horaInicio(), dto.horaFim()).toMinutes();
+		int cargaHorariaCalculada = (int) Math.max(1, Math.ceil(minutos / 60.0));
+
 		if (dto.id() == null || dto.id() == 0) {
 			Evento novoEvento = mapper.toEntity(dto);
+			novoEvento.setCargaHoraria(cargaHorariaCalculada);
 			aplicarCompetencias(novoEvento, dto.competenciaIds());
 			novoEvento = repository.save(novoEvento);
 
@@ -51,6 +57,7 @@ public class EventoService {
 			Evento existente = repository.findById(dto.id())
 					.orElseThrow(() -> new RuntimeException("Evento não encontrado"));
 			mapper.updateEntityFromDTO(dto, existente);
+			existente.setCargaHoraria(cargaHorariaCalculada);
 			aplicarCompetencias(existente, dto.competenciaIds());
 			return repository.save(existente);
 		}
