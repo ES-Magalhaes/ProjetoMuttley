@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragmentos/head :: head('Competências')}"></head>
+
+<body>
+    <header th:replace="~{fragmentos/header :: header(activePage='Competencia')}"></header>
+
+    <div class="container mt-4" style="max-width: 800px;">
+        <div th:if="${sucesso}"
+            style="background:#d4edda;color:#155724;padding:12px 16px;border-radius:6px;margin-bottom:1rem;">
+            <i class="fa-solid fa-check-circle"></i> [[${sucesso}]]
+        </div>
+        <div th:if="${erro}"
+            style="background:#f8d7da;color:#721c24;padding:12px 16px;border-radius:6px;margin-bottom:1rem;">
+            <i class="fa-solid fa-circle-exclamation"></i> [[${erro}]]
+        </div>
+
+        <div class="header-crud">
+            <h2>Competências Cadastradas</h2>
+            <a th:href="@{/competencia/formulario}" class="btn btn-primary">
+                <i class="fa-solid fa-plus me-1"></i> Nova Competência
+            </a>
+        </div>
+
+        <div th:if="${!competencias.isEmpty()}" class="card shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Nome</th>
+                            <th class="text-center">Tipo</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="c : ${competencias}">
+                            <td th:text="${c.nome}" class="fw-semibold"></td>
+                            <td class="text-center">
+                                <span th:if="${c.tipo.name() == 'SOFT_SKILL'}" class="badge bg-info text-dark">
+                                    <i class="fa-solid fa-heart me-1"></i> Soft Skill
+                                </span>
+                                <span th:if="${c.tipo.name() == 'HARD_SKILL'}" class="badge bg-secondary">
+                                    <i class="fa-solid fa-gear me-1"></i> Hard Skill
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <a th:href="@{'/competencia/formulario/' + ${c.id}}" class="text-primary me-3"
+                                    title="Editar">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </a>
+                                <a th:href="@{'/competencia/delete/' + ${c.id}}" class="text-danger" title="Excluir"
+                                    onclick="return confirm('Excluir esta competência?')">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div th:if="${competencias.isEmpty()}" class="alert alert-info text-center mt-3">
+            <i class="fa-solid fa-circle-info me-2"></i> Nenhuma competência cadastrada ainda.
+        </div>
+    </div>
+
+    
+</body>
+
+</html>

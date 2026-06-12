@@ -1,5 +1,9 @@
 package com.muttley.evento;
 
+import com.muttley.competencia.Competencia;
+import com.muttley.competencia.CompetenciaRepository;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +22,12 @@ public class EventoService {
 	@Autowired
 	private QrCodeService qrCodeService;
 
+	@Autowired
+	private CompetenciaRepository competenciaRepository;
+
+	@org.springframework.beans.factory.annotation.Value("${muttley.url.base:http://localhost:8081}")
+	private String urlBase;
+
 	public List<Evento> listarTodos() {
 		return repository.findAll();
 	}
@@ -28,21 +38,38 @@ public class EventoService {
 			throw new IllegalArgumentException("A hora de término não pode ser anterior à hora de início.");
 		}
 
+		// Calcula a carga horária automaticamente a partir do intervalo de horários
+		long minutos = Duration.between(dto.horaInicio(), dto.horaFim()).toMinutes();
+		int cargaHorariaCalculada = (int) Math.max(1, Math.ceil(minutos / 60.0));
+
 		if (dto.id() == null || dto.id() == 0) {
 			Evento novoEvento = mapper.toEntity(dto);
-			novoEvento = repository.save(novoEvento); // Salva para gerar o ID
+			novoEvento.setCargaHoraria(cargaHorariaCalculada);
+			aplicarCompetencias(novoEvento, dto.competenciaIds());
+			novoEvento = repository.save(novoEvento);
 
-			String urlInscricao = "http://localhost:8081/evento/inscrever/" + novoEvento.getId();
+			String urlInscricao = urlBase + "/evento/inscrever/" + novoEvento.getId();
 			String qrCode = qrCodeService.gerarQrCodeBase64(urlInscricao, 250, 250);
 			novoEvento.setQrCodeBase64(qrCode);
 
-			return repository.save(novoEvento); // Retorna a entidade salva com o QR Code
+			return repository.save(novoEvento);
 		} else {
 			Evento existente = repository.findById(dto.id())
 					.orElseThrow(() -> new RuntimeException("Evento não encontrado"));
 			mapper.updateEntityFromDTO(dto, existente);
-			return repository.save(existente); // Retorna a entidade atualizada
+			existente.setCargaHoraria(cargaHorariaCalculada);
+			aplicarCompetencias(existente, dto.competenciaIds());
+			return repository.save(existente);
 		}
+	}
+
+	private void aplicarCompetencias(Evento evento, List<Long> ids) {
+		if (ids == null || ids.isEmpty()) {
+			evento.setCompetencias(new ArrayList<>());
+			return;
+		}
+		List<Competencia> competencias = competenciaRepository.findAllById(ids);
+		evento.setCompetencias(competencias);
 	}
 
 	public Evento buscarPorId(Long id) {
@@ -54,10 +81,34 @@ public class EventoService {
 		return mapper.toDTO(evento);
 	}
 
+	@Autowired
+	private com.muttley.inscricao.InscricaoRepository inscricaoRepository;
+
 	@Transactional
 	public void excluir(Long id) {
-		if (repository.existsById(id)) {
-			repository.deleteById(id);
+		if (!repository.existsById(id)) {
+			throw new RuntimeException("Evento não encontrado.");
 		}
+
+		// Verifica se algum participante já fez check-in
+		List<com.muttley.inscricao.Inscricao> inscricoes = inscricaoRepository.findByEventoId(id);
+		boolean temCheckin = inscricoes.stream().anyMatch(com.muttley.inscricao.Inscricao::isPresencaConfirmada);
+
+		if (temCheckin) {
+			throw new RuntimeException("Não é possível excluir este evento. "
+					+ "Já existem participantes com check-in realizado e medalhas/certificados gerados.");
+		}
+
+		// Se não tem check-in, remove inscrições pendentes antes de excluir o evento
+		if (!inscricoes.isEmpty()) {
+			inscricaoRepository.deleteAll(inscricoes);
+		}
+
+		// Remove competências vinculadas (limpa a tabela join)
+		Evento evento = repository.findById(id).get();
+		evento.getCompetencias().clear();
+		repository.save(evento);
+
+		repository.deleteById(id);
 	}
 }

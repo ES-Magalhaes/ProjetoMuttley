@@ -20,11 +20,19 @@ public class PessoaService {
     private final InscricaoRepository inscricaoRepository;
     private final QrCodeService qrCodeService;
     private final PessoaMapper mapper;
+    private final com.muttley.medalha.MedalhaRepository medalhaRepository;
+
+    // ADICIONE ISTO: O Spring vai injetar o link público do Ngrok
+    @org.springframework.beans.factory.annotation.Value("${muttley.url.base:http://localhost:8081}")
+    private String urlBase;
 
     @Transactional
     public String inscreverPessoaEmEvento(DadosPessoa form, Long eventoId) {
-        // O fluxo agora lê de forma lógica e sequencial
         Evento evento = buscarEventoOuFalhar(eventoId);
+
+        // Validação de vagas
+        validarVagasDisponiveis(evento);
+
         Pessoa pessoa = buscarOuCriarPessoa(form);
 
         validarInscricaoInedita(pessoa.getId(), eventoId);
@@ -40,14 +48,49 @@ public class PessoaService {
     }
 
     private Pessoa buscarOuCriarPessoa(DadosPessoa form) {
-        // Usa o Mapper para instanciar a pessoa inteira em uma linha
-        return pessoaRepository.findByCpf(form.cpf())
-                .orElseGet(() -> pessoaRepository.save(mapper.toEntity(form)));
+        // Remove formatação do CPF antes de qualquer operação
+        String cpfLimpo = form.cpf().replaceAll("\\D", "");
+
+        // Validação de CPF
+        if (!isValidCpf(cpfLimpo)) {
+            throw new RuntimeException("CPF inválido. Verifique os dígitos informados.");
+        }
+
+        // Busca o ID via query nativa para evitar carregar proxy com tipo errado
+        java.util.Optional<Long> pessoaId = pessoaRepository.findIdByCpf(cpfLimpo);
+        if (pessoaId.isPresent()) {
+            return pessoaRepository.findById(pessoaId.get())
+                    .orElseThrow(() -> new RuntimeException("Pessoa não encontrada."));
+        }
+
+        // Validação de RA único ao criar nova pessoa na inscrição
+        if (form.ra() != null && !form.ra().isBlank()) {
+            java.util.Optional<Long> raExistente = pessoaRepository.findIdByRa(form.ra());
+            if (raExistente.isPresent()) {
+                throw new RuntimeException("Já existe um participante cadastrado com o RA: " + form.ra());
+            }
+        }
+
+        // Cria nova pessoa
+        DadosPessoa formLimpo = new DadosPessoa(
+                null, form.nome(), form.email(), cpfLimpo,
+                form.ra(), form.curso());
+        return pessoaRepository.save(mapper.toEntity(formLimpo));
     }
 
     private void validarInscricaoInedita(Long pessoaId, Long eventoId) {
         if (inscricaoRepository.existsByParticipanteIdAndEventoId(pessoaId, eventoId)) {
             throw new RuntimeException("Participante já está inscrito neste evento.");
+        }
+    }
+
+    private void validarVagasDisponiveis(Evento evento) {
+        if (evento.getNumeroVagas() != null) {
+            long inscritosAtual = inscricaoRepository.countByEventoId(evento.getId());
+            if (inscritosAtual >= evento.getNumeroVagas()) {
+                throw new RuntimeException("Não há mais vagas disponíveis para este evento. (" 
+                    + inscritosAtual + "/" + evento.getNumeroVagas() + ")");
+            }
         }
     }
 
@@ -60,7 +103,7 @@ public class PessoaService {
     }
 
     private String gerarEAtribuirQrCode(Inscricao inscricao) {
-        String urlCheckIn = "http://localhost:8081/evento/checkin/" + inscricao.getId();
+        String urlCheckIn = urlBase + "/evento/checkin/" + inscricao.getId();
         String qrCodeBase64 = qrCodeService.gerarQrCodeBase64(urlCheckIn, 250, 250);
 
         inscricao.setQrCodeBase64(qrCodeBase64);
@@ -70,9 +113,16 @@ public class PessoaService {
     }
 
     public List<DadosPessoa> listarTodos() {
+        // Retorna apenas pessoas que têm pelo menos uma inscrição (exclui organizadores sem inscrição)
         return pessoaRepository.findAll().stream()
+                .filter(p -> inscricaoRepository.existsByParticipanteId(p.getId()))
                 .map(mapper::toDto)
                 .toList();
+    }
+
+    public java.util.Optional<DadosPessoa> buscarPorCpf(String cpf) {
+        String cpfLimpo = cpf.replaceAll("\\D", "");
+        return pessoaRepository.findByCpf(cpfLimpo).map(mapper::toDto);
     }
 
     public DadosPessoa buscarParaEdicao(Long id) {
@@ -84,16 +134,59 @@ public class PessoaService {
 
     @Transactional
     public void salvarOuAtualizar(DadosPessoa dto) {
-        if (dto.id() != null) {
-            Pessoa pessoa = pessoaRepository.findById(dto.id())
+        // Garante que o CPF é sempre salvo sem formatação
+        String cpfLimpo = dto.cpf().replaceAll("\\D", "");
+
+        // Validação de CPF (11 dígitos)
+        if (!isValidCpf(cpfLimpo)) {
+            throw new RuntimeException("CPF inválido. Verifique os dígitos informados.");
+        }
+
+        DadosPessoa dtoLimpo = new DadosPessoa(
+                dto.id(), dto.nome(), dto.email(), cpfLimpo,
+                dto.ra(), dto.curso());
+
+        if (dtoLimpo.id() != null) {
+            Pessoa pessoa = pessoaRepository.findById(dtoLimpo.id())
                     .orElseThrow(() -> new RuntimeException("Pessoa não encontrada."));
-            mapper.updateEntityFromDto(dto, pessoa);
+            // Validação de RA único na edição
+            validarRaUnico(dtoLimpo.ra(), dtoLimpo.id());
+            mapper.updateEntityFromDto(dtoLimpo, pessoa);
             pessoaRepository.save(pessoa);
         } else {
-            if (pessoaRepository.existsByCpf(dto.cpf())) {
+            if (pessoaRepository.existsByCpf(cpfLimpo)) {
                 throw new RuntimeException("Já existe uma pessoa cadastrada com este CPF.");
             }
-            pessoaRepository.save(mapper.toEntity(dto));
+            // Validação de RA único no cadastro
+            validarRaUnico(dtoLimpo.ra(), null);
+            pessoaRepository.save(mapper.toEntity(dtoLimpo));
+        }
+    }
+
+    private void validarRaUnico(String ra, Long idAtual) {
+        if (ra == null || ra.isBlank()) return;
+        java.util.Optional<Long> existente = pessoaRepository.findIdByRa(ra);
+        if (existente.isPresent() && !existente.get().equals(idAtual)) {
+            throw new RuntimeException("Já existe um participante cadastrado com o RA: " + ra);
+        }
+    }
+
+    private boolean isValidCpf(String cpf) {
+        if (cpf == null || cpf.length() != 11 || cpf.matches("(\\d)\\1{10}")) return false;
+        try {
+            int soma = 0;
+            for (int i = 0; i < 9; i++) soma += (cpf.charAt(i) - '0') * (10 - i);
+            int dig1 = 11 - (soma % 11);
+            if (dig1 > 9) dig1 = 0;
+            if (dig1 != (cpf.charAt(9) - '0')) return false;
+
+            soma = 0;
+            for (int i = 0; i < 10; i++) soma += (cpf.charAt(i) - '0') * (11 - i);
+            int dig2 = 11 - (soma % 11);
+            if (dig2 > 9) dig2 = 0;
+            return dig2 == (cpf.charAt(10) - '0');
+        } catch (Exception e) {
+            return false;
         }
     }
 
@@ -102,6 +195,25 @@ public class PessoaService {
         validarIdSeguro(id);
         if (!pessoaRepository.existsById(id)) {
             throw new RuntimeException("Pessoa não encontrada.");
+        }
+
+        // Verifica se tem inscrições com check-in confirmado
+        java.util.List<com.muttley.inscricao.Inscricao> inscricoes = inscricaoRepository.findByParticipanteId(id);
+        boolean temCheckin = inscricoes.stream().anyMatch(com.muttley.inscricao.Inscricao::isPresencaConfirmada);
+
+        if (temCheckin) {
+            throw new RuntimeException("Não é possível excluir este participante. "
+                    + "Ele possui check-in confirmado em um ou mais eventos.");
+        }
+
+        // Remove medalhas vinculadas ao participante
+        java.util.List<com.muttley.medalha.Medalha> medalhas = medalhaRepository.findByParticipanteId(id);
+        if (!medalhas.isEmpty()) {
+            medalhaRepository.deleteAll(medalhas);
+        }
+        // Remove inscrições pendentes (sem check-in)
+        if (!inscricoes.isEmpty()) {
+            inscricaoRepository.deleteAll(inscricoes);
         }
         pessoaRepository.deleteById(id);
     }

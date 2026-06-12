@@ -32,9 +32,18 @@ public class Pessoa {
     // Dados específicos do participante/aluno exigidos pelo escopo
     private String ra;
     private String curso;
-    private String telefone;
 
     // Relacionamento um-para-múltos com a nova entidade intermediária de Inscrição
-    @OneToMany(mappedBy = "participante", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "participante", fetch = FetchType.LAZY)
     private List<Inscricao> inscricoes = new ArrayList<>();
+
+    // Retorna o CPF formatado (000.000.000-00) para exibição nas telas
+    // O banco sempre armazena sem formatação
+    public String getCpfFormatado() {
+        if (cpf == null || cpf.length() != 11) return cpf;
+        return cpf.substring(0, 3) + "." +
+               cpf.substring(3, 6) + "." +
+               cpf.substring(6, 9) + "-" +
+               cpf.substring(9);
+    }
 }

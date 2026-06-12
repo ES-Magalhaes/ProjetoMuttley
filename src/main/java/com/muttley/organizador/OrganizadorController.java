@@ -1,5 +1,8 @@
 package com.muttley.organizador;
 
+import com.muttley.evento.EventoRepository;
+import com.muttley.medalha.Medalha;
+import com.muttley.medalha.MedalhaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -7,12 +10,23 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/organizador")
 public class OrganizadorController {
 
 	@Autowired
 	private OrganizadorService organizadorService;
+
+	@Autowired
+	private OrganizadorRepository organizadorRepository;
+
+	@Autowired
+	private EventoRepository eventoRepository;
+
+	@Autowired
+	private MedalhaService medalhaService;
 
 	@GetMapping
 	public String listar(Model model) {
@@ -48,8 +62,28 @@ public class OrganizadorController {
 	}
 
 	@GetMapping("/delete/{id}")
-	public String excluir(@PathVariable Long id) {
-		organizadorService.excluir(id);
+	public String excluir(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes ra) {
+		try {
+			organizadorService.excluir(id);
+		} catch (Exception e) {
+			ra.addFlashAttribute("error", e.getMessage());
+		}
 		return "redirect:/organizador";
+	}
+
+	@GetMapping("/perfil/{id}")
+	public String perfil(@PathVariable Long id, Model model) {
+		Organizador organizador = organizadorRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("Organizador não encontrado."));
+
+		// Busca todas as medalhas concedidas (elas já nascem validadas na nossa
+		// arquitetura)
+		List<Medalha> medalhas = medalhaService.listarPorParticipante(id);
+
+		model.addAttribute("organizador", organizador);
+		model.addAttribute("eventos", eventoRepository.findByOrganizadorId(id));
+		model.addAttribute("medalhas", medalhas);
+		model.addAttribute("totalMedalhas", medalhas.size());
+		return "organizador/perfil";
 	}
 }

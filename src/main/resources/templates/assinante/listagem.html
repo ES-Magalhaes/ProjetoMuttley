@@ -1,0 +1,66 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+  <head th:replace="~{fragmentos/head :: head('Muttley System - Assinantes')}"></head>
+  <body>
+    <header th:replace="~{fragmentos/header :: header}" th:with="activePage='Assinante'"></header>
+
+    <main class="container" style="margin-top: 30px; margin-bottom: 50px; font-family: 'Quicksand', sans-serif;">
+      <div class="card" style="background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 20px;">
+
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px;">
+          <h2 style="margin: 0; color: #333; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-signature" style="color: #4a90e2"></i>
+            Assinantes de Certificado
+          </h2>
+          <a th:href="@{/assinante/formulario}" class="btn" style="background-color: #4a90e2; color: white; text-decoration: none; padding: 8px 16px; border-radius: 5px; font-weight: bold; font-size: 14px;">
+            <i class="fa-solid fa-plus" style="margin-right: 5px"></i> Novo Assinante
+          </a>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+              <tr style="background-color: #f1f3f5; color: #555; border-bottom: 2px solid #dee2e6;">
+                <th style="padding: 12px;">Nome</th>
+                <th style="padding: 12px;">Cargo</th>
+                <th style="padding: 12px;">Instituição</th>
+                <th style="padding: 12px;">Status</th>
+                <th style="padding: 12px; text-align: center;">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="a : ${assinantes}" style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px; font-weight: bold; color: #222;" th:text="${a.nome}">Nome</td>
+                <td style="padding: 12px; color: #555;" th:text="${a.cargo}">Cargo</td>
+                <td style="padding: 12px; color: #666;" th:text="${a.instituicao != null ? a.instituicao : '—'}">Instituição</td>
+                <td style="padding: 12px;">
+                  <span th:if="${a.ativo}" style="background-color: #d3f9d8; color: #2b8a3e; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">Ativo</span>
+                  <span th:unless="${a.ativo}" style="background-color: #e9ecef; color: #868e96; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">Inativo</span>
+                </td>
+                <td style="padding: 12px; text-align: center;">
+                  <div style="display: inline-flex; gap: 8px;">
+                    <a th:href="@{/assinante/formulario/{id}(id=${a.id})}" title="Editar" style="background-color: transparent; border: 1px solid #4a90e2; color: #4a90e2; padding: 4px 8px; border-radius: 4px; text-decoration: none;">
+                      <i class="fa-solid fa-pen"></i>
+                    </a>
+                    <a th:href="@{/assinante/delete/{id}(id=${a.id})}" title="Excluir" onclick="return confirm('Excluir este assinante?');" style="background-color: transparent; border: 1px solid #c2255c; color: #c2255c; padding: 4px 8px; border-radius: 4px; text-decoration: none;">
+                      <i class="fa-solid fa-trash"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr th:if="${#lists.isEmpty(assinantes)}">
+                <td colspan="5" style="padding: 40px; text-align: center; color: #999;">
+                  <i class="fa-solid fa-inbox" style="font-size: 36px; margin-bottom: 10px; display: block;"></i>
+                  Nenhum assinante cadastrado. Cadastre para que apareçam no formulário de evento.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <footer th:replace="~{fragmentos/footer :: footer}"></footer>
+  </body>
+</html>

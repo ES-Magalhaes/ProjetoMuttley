@@ -2,6 +2,7 @@ package com.muttley.evento;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -29,9 +30,15 @@ public record DadosEvento(
 
 		@NotNull(message = "A hora de término é obrigatória") @DateTimeFormat(pattern = "HH:mm") LocalTime horaFim,
 
-		@NotNull(message = "A carga horária é obrigatória") @Min(value = 1, message = "A carga horária mínima é de 1 hora") Integer cargaHoraria,
+		Integer cargaHoraria, // Calculado automaticamente a partir de horaInicio e horaFim
 
 		@NotNull(message = "O número de vagas é obrigatório") @Min(value = 1, message = "O número mínimo de vagas é 1") Integer numeroVagas,
 
-		@NotNull(message = "Selecione um organizador") Long organizadorId) {
+		@NotNull(message = "Selecione um organizador") Long organizadorId,
+
+		// ID do assinante do certificado (opcional)
+		Long assinanteId,
+
+		// IDs das competências associadas ao evento (opcional)
+		List<Long> competenciaIds) {
 }

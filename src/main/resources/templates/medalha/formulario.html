@@ -1,0 +1,256 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+  <head
+    th:replace="~{fragmentos/head :: head('Muttley System - Criar Medalha')}"
+  ></head>
+  <body>
+    <header
+      th:replace="~{fragmentos/header :: header}"
+      th:with="activePage='Medalha'"
+    ></header>
+
+    <main
+      class="container"
+      style="
+        margin-top: 30px;
+        margin-bottom: 50px;
+        font-family: &quot;Quicksand&quot;, sans-serif;
+        display: flex;
+        justify-content: center;
+      "
+    >
+      <div
+        class="card"
+        style="
+          background: white;
+          border-radius: 8px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+          padding: 30px;
+          width: 100%;
+          max-width: 650px;
+        "
+      >
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+          "
+        >
+          <h2
+            style="
+              margin: 0;
+              color: #333;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              font-size: 22px;
+            "
+          >
+            <i class="fa-solid fa-award" style="color: #4a90e2"></i> Cadastrar
+            Tipo de Medalha
+          </h2>
+          <a
+            th:href="@{/medalha}"
+            style="
+              color: #666;
+              text-decoration: none;
+              font-size: 14px;
+              font-weight: bold;
+              display: flex;
+              align-items: center;
+              gap: 5px;
+            "
+          >
+            <i class="fa-solid fa-arrow-left"></i> Voltar
+          </a>
+        </div>
+
+        <form
+          th:action="@{/medalha/salvar}"
+          th:object="${medalha}"
+          method="post"
+          style="display: flex; flex-direction: column; gap: 20px"
+        >
+          <div>
+            <label
+              for="nome"
+              style="
+                display: block;
+                font-weight: bold;
+                margin-bottom: 8px;
+                color: #555;
+              "
+              >Nome da Medalha</label
+            >
+            <input
+              type="text"
+              id="nome"
+              th:field="*{nome}"
+              placeholder="Ex: Desenvolvedor Destaque, Aluno Proativo"
+              required
+              style="
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-family: inherit;
+              "
+            />
+          </div>
+
+          <div>
+            <label
+              for="descricao"
+              style="
+                display: block;
+                font-weight: bold;
+                margin-bottom: 8px;
+                color: #555;
+              "
+              >Descrição / Critério de Concessão</label
+            >
+            <textarea
+              id="descricao"
+              th:field="*{descricao}"
+              rows="4"
+              placeholder="Descreva sucintamente o que o aluno precisa realizar para receber este reconhecimento..."
+              required
+              style="
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-family: inherit;
+                resize: vertical;
+              "
+            ></textarea>
+          </div>
+
+          <div style="display: flex; gap: 20px; flex-wrap: wrap">
+            <div style="flex: 1; min-width: 250px">
+              <label
+                for="icone"
+                style="
+                  display: block;
+                  font-weight: bold;
+                  margin-bottom: 8px;
+                  color: #555;
+                "
+                >Estilização do Ícone</label
+              >
+              <select
+                id="icone"
+                th:field="*{icone}"
+                required
+                style="
+                  width: 100%;
+                  padding: 10px;
+                  border: 1px solid #ccc;
+                  border-radius: 4px;
+                  box-sizing: border-box;
+                  font-family: inherit;
+                  background-color: white;
+                "
+              >
+                <option value="fa-solid fa-trophy">
+                  🏆 Troféu Administrativo
+                </option>
+                <option value="fa-solid fa-star">⭐ Estrela do Mérito</option>
+                <option value="fa-solid fa-circle-check">
+                  Sêlo de Validação
+                </option>
+                <option value="fa-solid fa-gem">💎 Diamante Tecnológico</option>
+                <option value="fa-solid fa-graduation-cap">
+                  🎓 Conclusão / Certificado
+                </option>
+              </select>
+            </div>
+
+            <div style="flex: 1; min-width: 250px">
+              <label
+                for="tipo"
+                style="
+                  display: block;
+                  font-weight: bold;
+                  margin-bottom: 8px;
+                  color: #555;
+                "
+                >Categoria do Sistema</label
+              >
+              <input
+                type="text"
+                id="tipo"
+                th:field="*{tipo}"
+                readonly
+                style="
+                  width: 100%;
+                  padding: 10px;
+                  border: 1px solid #ccc;
+                  border-radius: 4px;
+                  box-sizing: border-box;
+                  font-family: inherit;
+                  background-color: #f1f3f5;
+                  color: #777;
+                  cursor: not-allowed;
+                "
+              />
+            </div>
+          </div>
+
+          <div
+            style="
+              display: flex;
+              justify-content: flex-end;
+              gap: 12px;
+              margin-top: 15px;
+              border-top: 1px solid #f0f0f0;
+              padding-top: 20px;
+            "
+          >
+            <button
+              type="reset"
+              class="btn"
+              style="
+                background-color: #e9ecef;
+                color: #495057;
+                border: 1px solid #ced4da;
+                padding: 10px 20px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+                font-family: inherit;
+              "
+            >
+              Limpar
+            </button>
+            <button
+              type="submit"
+              class="btn"
+              style="
+                background-color: #4a90e2;
+                color: white;
+                border: none;
+                padding: 10px 24px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+                font-family: inherit;
+              "
+            >
+              <i class="fa-solid fa-floppy-disk" style="margin-right: 5px"></i>
+              Salvar Registro
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <footer th:replace="~{fragmentos/footer :: footer}"></footer>
+  </body>
+</html>

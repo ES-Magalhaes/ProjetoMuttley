@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import com.muttley.competencia.Competencia;
 import com.muttley.inscricao.Inscricao;
 import com.muttley.organizador.Organizador;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,9 +15,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.FutureOrPresent; // <-- Importação do Validation adicionada
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,6 +48,8 @@ public class Evento {
 	private String modalidade; // Ex: Presencial, Online, Híbrido
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@FutureOrPresent(message = "A data do evento não pode ser uma data que já passou.") // <-- Regra de validação
+																						// aplicada
 	private LocalDate data;
 
 	@DateTimeFormat(pattern = "HH:mm")
@@ -63,6 +69,11 @@ public class Evento {
 	@JoinColumn(name = "organizador_id")
 	private Organizador organizador;
 
+	// Assinante do certificado deste evento
+	@ManyToOne
+	@JoinColumn(name = "assinante_id")
+	private com.muttley.assinante.Assinante assinante;
+
 	// Relacionamento correto com a entidade intermediária Inscricao
 	@OneToMany(mappedBy = "evento")
 	private List<Inscricao> inscricoes;
@@ -71,4 +82,9 @@ public class Evento {
 	@Lob
 	@Column(columnDefinition = "LONGTEXT")
 	private String qrCodeBase64;
+
+	// Competências desenvolvidas neste evento (Soft Skills e Hard Skills)
+	@ManyToMany
+	@JoinTable(name = "evento_competencias", joinColumns = @JoinColumn(name = "evento_id"), inverseJoinColumns = @JoinColumn(name = "competencia_id"))
+	private java.util.List<Competencia> competencias = new java.util.ArrayList<>();
 }

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/head :: head('Perfil do Organizador')}"></head>
+<body>
+<header th:replace="~{fragmentos/header :: header(activePage='organizadores')}"></header>
+
+<div class="container mt-4" style="max-width: 900px;">
+
+    <!-- Cabeçalho do perfil -->
+    <div class="card shadow-sm mb-4" style="border-radius:12px; overflow:hidden;">
+        <div style="background:linear-gradient(135deg, #2c3e50, #3498db); padding:24px 32px; color:#fff;">
+            <div style="display:flex; align-items:center; gap:20px;">
+                <div style="width:80px; height:80px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:2rem;">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+                <div>
+                    <h2 style="margin:0;" th:text="${organizador.nome}"></h2>
+                    <p style="margin:4px 0 0; opacity:0.9;" th:text="${organizador.areaAtuacao != null ? organizador.areaAtuacao : ''}"></p>
+                </div>
+            </div>
+        </div>
+        <div style="padding:20px 32px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <div>
+                    <small style="color:#888; font-weight:600;">E-mail</small>
+                    <p style="margin:2px 0;" th:text="${organizador.email}"></p>
+                </div>
+                <div>
+                    <small style="color:#888; font-weight:600;">Instituição</small>
+                    <p style="margin:2px 0;" th:text="${organizador.instituicao != null ? organizador.instituicao : '-'}"></p>
+                </div>
+                <div>
+                    <small style="color:#888; font-weight:600;">Formação</small>
+                    <p style="margin:2px 0;" th:text="${organizador.formacao != null ? organizador.formacao : '-'}"></p>
+                </div>
+                <div th:if="${organizador.linkedin != null and !organizador.linkedin.isEmpty()}">
+                    <small style="color:#888; font-weight:600;">LinkedIn</small>
+                    <p style="margin:2px 0;">
+                        <a th:href="${organizador.linkedin}" target="_blank" style="text-decoration:none; color:#0077b5;">
+                            <i class="fa-brands fa-linkedin me-1"></i> Ver perfil
+                        </a>
+                    </p>
+                </div>
+            </div>
+            <div th:if="${organizador.miniCurriculo != null and !organizador.miniCurriculo.isEmpty()}" style="margin-top:16px; padding-top:16px; border-top:1px solid #eee;">
+                <small style="color:#888; font-weight:600;">Mini Currículo</small>
+                <p style="margin:4px 0; color:#555;" th:text="${organizador.miniCurriculo}"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumo -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
+        <div class="card text-center shadow-sm" style="border-radius:10px;">
+            <div style="padding:16px;">
+                <div style="font-size:2rem; font-weight:700; color:#3498db;" th:text="${eventos.size()}"></div>
+                <div style="color:#888;">Eventos organizados</div>
+            </div>
+        </div>
+        <div class="card text-center shadow-sm" style="border-radius:10px;">
+            <div style="padding:16px;">
+                <div style="font-size:2rem; font-weight:700; color:#F5A623;" th:text="${totalMedalhas}"></div>
+                <div style="color:#888;">Medalhas</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Medalhas -->
+    <div class="card shadow-sm mb-4" style="border-radius:10px; overflow:hidden;">
+        <div style="background:#F5A623; color:#fff; padding:12px 20px; font-weight:600;">
+            <i class="fa-solid fa-medal me-2"></i> Medalhas
+        </div>
+        <div style="padding:16px;">
+            <div th:if="${medalhas.isEmpty()}" style="text-align:center; color:#888; padding:8px;">
+                Nenhuma medalha conquistada ainda.
+            </div>
+            <div th:unless="${medalhas.isEmpty()}" style="display:flex; flex-wrap:wrap; gap:12px;">
+                <div th:each="m : ${medalhas}" style="background:#fff9e6; border:1px solid #F5A623; border-radius:8px; padding:12px 16px; min-width:180px; text-align:center;">
+                    <div style="font-size:1.5rem; color:#F5A623;"><i class="fa-solid fa-medal"></i></div>
+                    <div style="font-weight:600; font-size:0.85rem;" th:text="${m.tipo.descricao}"></div>
+                    <div style="color:#888; font-size:0.8rem;" th:text="${m.evento.nome}"></div>
+                    <div style="color:#aaa; font-size:0.75rem;" th:text="${#temporals.format(m.dataConcessao, 'dd/MM/yyyy')}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Eventos organizados -->
+    <div class="card shadow-sm" style="border-radius:10px; overflow:hidden;">
+        <div style="background:#2c3e50; color:#fff; padding:12px 20px; font-weight:600;">
+            <i class="fa-solid fa-calendar-check me-2"></i> Eventos Organizados
+        </div>
+        <div th:if="${eventos.isEmpty()}" style="padding:20px; text-align:center; color:#888;">
+            Nenhum evento organizado ainda.
+        </div>
+        <div th:unless="${eventos.isEmpty()}" style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse;">
+                <thead style="background:#f8f9fa;">
+                    <tr>
+                        <th style="padding:10px 16px; text-align:left;">Evento</th>
+                        <th style="padding:10px 16px; text-align:center;">Categoria</th>
+                        <th style="padding:10px 16px; text-align:center;">Data</th>
+                        <th style="padding:10px 16px; text-align:center;">Carga Horária</th>
+                        <th style="padding:10px 16px; text-align:center;">Vagas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="e : ${eventos}" style="border-bottom:1px solid #eee;">
+                        <td style="padding:10px 16px; font-weight:600;" th:text="${e.nome}"></td>
+                        <td style="padding:10px 16px; text-align:center;" th:text="${e.categoria}"></td>
+                        <td style="padding:10px 16px; text-align:center;" th:text="${#temporals.format(e.data, 'dd/MM/yyyy')}"></td>
+                        <td style="padding:10px 16px; text-align:center;" th:text="${e.cargaHoraria != null ? e.cargaHoraria + 'h' : '-'}"></td>
+                        <td style="padding:10px 16px; text-align:center;" th:text="${e.numeroVagas}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- LinkedIn -->
+    <div th:if="${organizador.linkedin != null and !organizador.linkedin.isEmpty()}"
+         style="margin-top:20px; padding:16px 20px; background:#f0f8ff; border:1px solid #d0e8ff; border-radius:10px; display:flex; align-items:center; gap:12px;">
+        <i class="fa-brands fa-linkedin" style="font-size:1.5rem; color:#0077b5;"></i>
+        <div>
+            <strong>Perfil no LinkedIn</strong>
+            <div style="font-size:0.85rem;">
+                <a th:href="${organizador.linkedin}" target="_blank" style="color:#0077b5; text-decoration:none;">
+                    Acessar perfil profissional
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voltar -->
+    <div style="margin-top:16px; margin-bottom:32px;">
+        <a th:href="@{/organizador}" style="text-decoration:none; color:#6c757d;">
+            <i class="fa-solid fa-arrow-left me-1"></i> Voltar para Organizadores
+        </a>
+    </div>
+
+</div>
+
+<div th:replace="~{fragmentos/footer :: footer}"></div>
+</body>
+</html>

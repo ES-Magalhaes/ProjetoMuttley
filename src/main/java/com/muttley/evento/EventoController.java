@@ -3,7 +3,9 @@ package com.muttley.evento;
 import com.muttley.pessoa.DadosPessoa;
 import com.muttley.pessoa.PessoaService;
 import com.muttley.inscricao.InscricaoService;
-import com.muttley.organizador.OrganizadorService; // Certifique-se de importar o seu serviço de organizadores
+import com.muttley.competencia.CompetenciaRepository;
+import com.muttley.assinante.AssinanteRepository;
+import com.muttley.organizador.OrganizadorService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,7 +27,13 @@ public class EventoController {
 	private InscricaoService inscricaoService;
 
 	@Autowired
-	private OrganizadorService organizadorService; // Injetado para carregar a lista no <select> do formulário
+	private OrganizadorService organizadorService;
+
+	@Autowired
+	private CompetenciaRepository competenciaRepository;
+
+	@Autowired
+	private AssinanteRepository assinanteRepository;
 
 	// =========================================================================
 	// ROTAS DO CRUD DE EVENTOS (Adicionadas para corrigir o Erro 404)
@@ -38,23 +46,27 @@ public class EventoController {
 		return "evento/listagem"; // Alinhe com o nome real do seu arquivo (ex: evento/listagem ou evento/index)
 	}
 
-	// GET /evento/formulario - Abre o formulário para criar um NOVO evento
 	@GetMapping("/formulario")
 	public String exibirFormularioNovo(Model model) {
-		// Passa um DTO vazio inicializado com nulls/vazio para o th:object do Thymeleaf
-		model.addAttribute("evento", new DadosEvento(null, "", "", "", "", "", null, null, null, null, null, null));
+		model.addAttribute("evento", new DadosEvento(null, "", "", "", "", "", null, null, null, null, null, null, null, null));
 		model.addAttribute("organizadores", organizadorService.listarTodos());
+		model.addAttribute("todasCompetencias", competenciaRepository.findAll());
+		model.addAttribute("assinantes", assinanteRepository.findByAtivoTrue());
 		return "evento/formulario";
 	}
 
-	// GET /evento/formulario/{id} - Abre o formulário preenchido para EDITAR um
-	// evento
 	@GetMapping("/formulario/{id}")
 	public String exibirFormularioEditar(@PathVariable Long id, Model model) {
 		try {
 			DadosEvento dto = eventoService.buscarParaEdicao(id);
 			model.addAttribute("evento", dto);
 			model.addAttribute("organizadores", organizadorService.listarTodos());
+			model.addAttribute("todasCompetencias", competenciaRepository.findAll());
+			model.addAttribute("assinantes", assinanteRepository.findByAtivoTrue());
+			// IDs das competências já associadas ao evento
+			model.addAttribute("competenciasSelecionadas",
+				eventoService.buscarPorId(id).getCompetencias().stream()
+					.map(c -> c.getId()).toList());
 			return "evento/formulario";
 		} catch (Exception e) {
 			model.addAttribute("error", e.getMessage());
@@ -95,11 +107,12 @@ public class EventoController {
 
 	// GET /evento/delete/{id} - Exclui o evento do sistema
 	@GetMapping("/delete/{id}")
-	public String excluirEvento(@PathVariable Long id) {
+	public String excluirEvento(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes ra) {
 		try {
 			eventoService.excluir(id);
+			ra.addFlashAttribute("message", "Evento excluído com sucesso.");
 		} catch (Exception e) {
-			// Tratamento opcional se houver dependências vinculadas ao evento
+			ra.addFlashAttribute("error", e.getMessage());
 		}
 		return "redirect:/evento";
 	}
@@ -109,7 +122,7 @@ public class EventoController {
 		try {
 			Evento evento = eventoService.buscarPorId(id);
 			model.addAttribute("evento", evento);
-			model.addAttribute("dadosPessoa", new DadosPessoa(null, "", "", "", "", "", null));
+			model.addAttribute("dadosPessoa", new DadosPessoa(null, "", "", "", "", ""));
 			return "inscricao/formulario-inscricao";
 		} catch (Exception e) {
 			model.addAttribute("error", "Evento não encontrado.");
@@ -142,5 +155,18 @@ public class EventoController {
 			model.addAttribute("status", "ERRO");
 		}
 		return "inscricao/checkin-inscricao";
+	}
+
+	@GetMapping("/participantes/{id}")
+	public String listarParticipantes(@PathVariable Long id, Model model) {
+		try {
+			Evento evento = eventoService.buscarPorId(id);
+			model.addAttribute("evento", evento);
+			model.addAttribute("inscricoes", inscricaoService.listarPorEvento(id));
+		} catch (Exception e) {
+			model.addAttribute("error", e.getMessage());
+			return "redirect:/evento";
+		}
+		return "evento/participantes";
 	}
 }

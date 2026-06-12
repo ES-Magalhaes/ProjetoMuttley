@@ -1,0 +1,418 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+  <head
+    th:replace="~{fragmentos/head :: head('Muttley System - Medalhas')}"
+  ></head>
+  <body>
+    <header
+      th:replace="~{fragmentos/header :: header}"
+      th:with="activePage='Medalha'"
+    ></header>
+
+    <main
+      class="container"
+      style="
+        margin-top: 30px;
+        margin-bottom: 50px;
+        font-family: &quot;Quicksand&quot;, sans-serif;
+      "
+    >
+      <div
+        class="card"
+        style="
+          background: white;
+          border-radius: 8px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+          padding: 20px;
+        "
+      >
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+          "
+        >
+          <h2
+            style="
+              margin: 0;
+              color: #333;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+            "
+          >
+            <i class="fa-solid fa-list-check" style="color: #4a90e2"></i>
+            <span th:text="${participante.nome}">Painel de Moderação</span>
+          </h2>
+          <div style="display: flex; gap: 10px;">
+            <a
+              th:href="@{/medalha/regras}"
+              class="btn"
+              style="
+                background-color: #4a90e2;
+                color: white;
+                text-decoration: none;
+                padding: 8px 16px;
+                border-radius: 5px;
+                font-weight: bold;
+                font-size: 14px;
+              "
+            >
+              <i class="fa-solid fa-gears" style="margin-right: 5px"></i> Regras de Medalha
+            </a>
+          </div>
+        </div>
+
+        <form th:action="@{/medalha/em-lote}" method="post" id="formLote">
+          <div
+            style="
+              background-color: #f8f9fa;
+              padding: 12px;
+              border-radius: 6px;
+              margin-bottom: 15px;
+              display: flex;
+              gap: 10px;
+              align-items: center;
+            "
+          >
+            <span style="color: #666; font-size: 14px; font-weight: bold"
+              >Ações em lote:</span
+            >
+            <button
+              type="submit"
+              name="acao"
+              value="aprovar"
+              class="btn"
+              style="
+                background-color: #2ec4b6;
+                color: white;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: 600;
+              "
+            >
+              <i class="fa-solid fa-check-double" style="margin-right: 5px"></i>
+              Aprovar Selecionadas
+            </button>
+            <button
+              type="submit"
+              name="acao"
+              value="reprovar"
+              class="btn"
+              style="
+                background-color: #e71d36;
+                color: white;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: 600;
+              "
+            >
+              <i class="fa-solid fa-square-xmark" style="margin-right: 5px"></i>
+              Reprovar Selecionadas
+            </button>
+          </div>
+
+          <div style="overflow-x: auto">
+            <!-- Filtros por coluna -->
+            <div id="filtros" style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-filter" style="color: #888;"></i>
+                <span style="font-size: 13px; color: #666; font-weight: bold;">Filtros:</span>
+              </div>
+              <input type="text" id="filtroNome" placeholder="Medalha..."
+                style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; width: 150px; font-family: inherit;" />
+              <input type="text" id="filtroDescricao" placeholder="Descrição..."
+                style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; width: 180px; font-family: inherit;" />
+              <select id="filtroCategoria"
+                style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; font-family: inherit; background: white;">
+                <option value="">Todas Categorias</option>
+                <option value="PARTICIPACOES_CATEGORIA">Participações Categoria</option>
+                <option value="PARTICIPACOES_TOTAL">Participações Total</option>
+                <option value="CARGA_HORARIA">Carga Horária</option>
+                <option value="EVENTO_ESPECIFICO">Evento Específico</option>
+                <option value="ORGANIZADOR">Organizador</option>
+              </select>
+              <select id="filtroStatus"
+                style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; font-family: inherit; background: white;">
+                <option value="">Todos Status</option>
+                <option value="PENDENTE">Pendente</option>
+                <option value="APROVADA">Aprovada</option>
+                <option value="REPROVADA">Reprovada</option>
+              </select>
+              <button type="button" onclick="limparFiltros()" style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; background: #f8f9fa; cursor: pointer; font-size: 13px; font-family: inherit;">
+                <i class="fa-solid fa-eraser"></i> Limpar
+              </button>
+            </div>
+
+            <table id="tabelaMedalhas"
+              style="width: 100%; border-collapse: collapse; text-align: left"
+            >
+              <thead>
+                <tr
+                  style="
+                    background-color: #f1f3f5;
+                    color: #555;
+                    border-bottom: 2px solid #dee2e6;
+                  "
+                >
+                  <th style="padding: 12px; width: 40px; text-align: center">
+                    <input
+                      type="checkbox"
+                      id="selectAll"
+                      style="transform: scale(1.2); cursor: pointer"
+                    />
+                  </th>
+                  <th style="padding: 12px">Medalha</th>
+                  <th style="padding: 12px">Descrição / Requisito</th>
+                  <th style="padding: 12px">Categoria</th>
+                  <th style="padding: 12px">Status</th>
+                  <th style="padding: 12px; text-align: center">
+                    Ações Individuais
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  th:each="m : ${medalhas}"
+                  class="medalha-row"
+                  th:data-nome="${m.nome}"
+                  th:data-descricao="${m.descricao}"
+                  th:data-tipo="${m.tipo}"
+                  th:data-status="${m.status}"
+                  style="
+                    border-bottom: 1px solid #eee;
+                    transition: background 0.2s;
+                  "
+                >
+                  <td style="padding: 12px; text-align: center">
+                    <input
+                      type="checkbox"
+                      name="ids"
+                      th:value="${m.id}"
+                      class="check-item"
+                      style="transform: scale(1.2); cursor: pointer"
+                    />
+                  </td>
+                  <td style="padding: 12px; font-weight: bold; color: #222">
+                    <div style="display: flex; align-items: center; gap: 12px">
+                      <div
+                        style="
+                          background-color: #343a40;
+                          color: white;
+                          width: 35px;
+                          height: 35px;
+                          border-radius: 6px;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                        "
+                      >
+                        <i th:class="${m.icone}"></i>
+                      </div>
+                      <span th:text="${m.nome}">Nome da Medalha</span>
+                    </div>
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      color: #666;
+                      max-width: 300px;
+                      font-size: 14px;
+                    "
+                    th:text="${m.descricao}"
+                  >
+                    Descrição
+                  </td>
+                  <td style="padding: 12px">
+                    <span
+                      style="
+                        background-color: #e9ecef;
+                        color: #495057;
+                        padding: 4px 8px;
+                        border-radius: 4px;
+                        font-size: 12px;
+                        font-weight: bold;
+                      "
+                      th:text="${m.tipo}"
+                      >Tipo</span
+                    >
+                  </td>
+                  <td style="padding: 12px">
+                    <span
+                      th:if="${m.status == 'PENDENTE'}"
+                      style="
+                        background-color: #ffe3e3;
+                        color: #ff6b6b;
+                        padding: 4px 8px;
+                        border-radius: 4px;
+                        font-size: 12px;
+                        font-weight: bold;
+                      "
+                      >Pendente</span
+                    >
+                    <span
+                      th:if="${m.status == 'APROVADA'}"
+                      style="
+                        background-color: #d3f9d8;
+                        color: #2b8a3e;
+                        padding: 4px 8px;
+                        border-radius: 4px;
+                        font-size: 12px;
+                        font-weight: bold;
+                      "
+                      >Aprovada</span
+                    >
+                    <span
+                      th:if="${m.status == 'REPROVADA'}"
+                      style="
+                        background-color: #fff0f6;
+                        color: #c2255c;
+                        padding: 4px 8px;
+                        border-radius: 4px;
+                        font-size: 12px;
+                        font-weight: bold;
+                      "
+                      >Reprovada</span
+                    >
+                  </td>
+                  <td style="padding: 12px; text-align: center">
+                    <div style="display: inline-flex; gap: 8px">
+                      <form
+                        th:action="@{/medalha/aprovar/{id}(id=${m.id})}"
+                        method="post"
+                        style="margin: 0"
+                      >
+                        <button
+                          type="submit"
+                          title="Aprovar"
+                          style="
+                            background-color: transparent;
+                            border: 1px solid #2b8a3e;
+                            color: #2b8a3e;
+                            padding: 4px 8px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                          "
+                        >
+                          <i class="fa-solid fa-check"></i>
+                        </button>
+                      </form>
+                      <form
+                        th:action="@{/medalha/reprovar/{id}(id=${m.id})}"
+                        method="post"
+                        style="margin: 0"
+                      >
+                        <button
+                          type="submit"
+                          title="Reprovar"
+                          style="
+                            background-color: transparent;
+                            border: 1px solid #c2255c;
+                            color: #c2255c;
+                            padding: 4px 8px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                          "
+                        >
+                          <i class="fa-solid fa-xmark"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(medalhas)}">
+                  <td
+                    colspan="6"
+                    style="padding: 40px; text-align: center; color: #999"
+                  >
+                    <i
+                      class="fa-solid fa-inbox"
+                      style="
+                        font-size: 36px;
+                        margin-bottom: 10px;
+                        display: block;
+                      "
+                    ></i>
+                    Nenhuma insígnia pendente ou cadastrada no sistema.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <footer th:replace="~{fragmentos/footer :: footer}"></footer>
+
+    <script>
+      // Select all / deselect all
+      const selectAllCheckbox = document.getElementById("selectAll");
+      const itemCheckboxes = document.querySelectorAll(".check-item");
+
+      selectAllCheckbox.addEventListener("change", function () {
+        itemCheckboxes.forEach((cb) => {
+          cb.checked = selectAllCheckbox.checked;
+        });
+      });
+
+      itemCheckboxes.forEach((cb) => {
+        cb.addEventListener("change", function () {
+          if (!this.checked) {
+            selectAllCheckbox.checked = false;
+          }
+        });
+      });
+
+      // Filtros por coluna
+      var filtroNome = document.getElementById('filtroNome');
+      var filtroDescricao = document.getElementById('filtroDescricao');
+      var filtroCategoria = document.getElementById('filtroCategoria');
+      var filtroStatus = document.getElementById('filtroStatus');
+
+      function aplicarFiltros() {
+        var nome = filtroNome.value.toLowerCase();
+        var descricao = filtroDescricao.value.toLowerCase();
+        var categoria = filtroCategoria.value;
+        var status = filtroStatus.value;
+
+        var rows = document.querySelectorAll('.medalha-row');
+        rows.forEach(function(row) {
+          var rowNome = (row.dataset.nome || '').toLowerCase();
+          var rowDescricao = (row.dataset.descricao || '').toLowerCase();
+          var rowTipo = row.dataset.tipo || '';
+          var rowStatus = row.dataset.status || '';
+
+          var matchNome = !nome || rowNome.includes(nome);
+          var matchDescricao = !descricao || rowDescricao.includes(descricao);
+          var matchCategoria = !categoria || rowTipo === categoria;
+          var matchStatus = !status || rowStatus === status;
+
+          row.style.display = (matchNome && matchDescricao && matchCategoria && matchStatus) ? '' : 'none';
+        });
+      }
+
+      function limparFiltros() {
+        filtroNome.value = '';
+        filtroDescricao.value = '';
+        filtroCategoria.value = '';
+        filtroStatus.value = '';
+        aplicarFiltros();
+      }
+
+      filtroNome.addEventListener('input', aplicarFiltros);
+      filtroDescricao.addEventListener('input', aplicarFiltros);
+      filtroCategoria.addEventListener('change', aplicarFiltros);
+      filtroStatus.addEventListener('change', aplicarFiltros);
+    </script>
+  </body>
+</html>

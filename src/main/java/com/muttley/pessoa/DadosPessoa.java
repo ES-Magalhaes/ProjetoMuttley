@@ -14,6 +14,6 @@ public record DadosPessoa(
                 @NotBlank(message = "O CPF é obrigatório.") String cpf,
 
                 String ra,
-                String curso,
-                String telefone) {
+                String curso
+               ) {
 }
